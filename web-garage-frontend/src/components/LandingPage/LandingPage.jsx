@@ -39,14 +39,14 @@ const LandingPage = () => {
           <div className={styles.ctaButtons}>
             {/* UPDATED LINK for students */}
             <Link
-              to="/student-signup"
+              to="/signup/student"
               className={`${styles.btn} ${styles.btnPrimary}`}
             >
               Join as Student
             </Link>
             {/* UPDATED LINK for schools/teachers */}
             <Link
-              to="/school-signup"
+              to="/signup/school"
               className={`${styles.btn} ${styles.btnSecondary}`}
             >
               Onboard Your School

@@ -1,53 +1,42 @@
+/* Compact CSS for both SignUp forms */
+
 .pageContainer {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #e8f5e9, #f0f4f8);
-  padding: 40px 20px;
-  animation: fadeIn 1s ease-in;
-}
-
-/* Fade-in animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  background-color: #f0f4f8;
+  padding: 1rem; /* Reduced padding */
 }
 
 .formContainer {
-  background: white;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  padding: 1.5rem 2rem; /* Reduced padding */
+  border-radius: 8px; /* Slightly smaller radius */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  max-width: 420px; /* Further reduced width */
   width: 100%;
-  max-width: 500px;
-  animation: slideUp 0.8s ease-out;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  text-align: center;
 }
 
 .title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 10px;
-  color: #2e7d32;
+  font-size: 1.5rem; /* Reduced font size */
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.25rem; /* Tighter spacing */
 }
 
 .subtitle {
-  text-align: center;
-  color: #4e6e58;
-  margin-bottom: 30px;
-  font-size: 1rem;
+  font-size: 0.9rem; /* Reduced font size */
+  color: #4a5568;
+  margin-bottom: 1.5rem; /* Tighter spacing */
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0.75rem; /* Reduced gap between form groups */
+  text-align: left;
 }
 
 .formGroup {
@@ -56,61 +45,61 @@
 }
 
 .formLabel {
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-  color: #388e3c;
+  font-size: 0.8rem; /* Reduced font size */
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 0.25rem; /* Tighter spacing */
 }
 
 .formInput,
 .formSelect {
-  padding: 12px 15px;
-  border: 1px solid #cfd8dc;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background-color: #f9fbe7;
+  width: 100%;
+  padding: 0.5rem 0.75rem; /* Reduced padding */
+  font-size: 0.9rem; /* Reduced font size */
+  border: 1px solid #cbd5e0;
+  border-radius: 6px; /* Smaller radius */
+  background-color: #f7fafc;
+  color: #2d3748;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .formInput:focus,
 .formSelect:focus {
   outline: none;
-  border-color: #66bb6a;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.3);
+  border-color: #4299e1;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.4);
 }
 
 .submitButton {
-  padding: 15px;
-  border: none;
-  background-color: #43a047;
-  color: white;
-  font-size: 1.1rem;
+  width: 100%;
+  padding: 0.6rem; /* Reduced padding */
+  font-size: 0.9rem; /* Reduced font size */
   font-weight: 600;
-  border-radius: 8px;
+  color: #ffffff;
+  background-color: #2c7a7b;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-top: 10px;
+  transition: background-color 0.2s;
+  margin-top: 0.75rem; /* Reduced margin */
 }
 
 .submitButton:hover {
-  background-color: #388e3c;
-  transform: translateY(-2px);
+  background-color: #285e61;
 }
 
 .switchLink {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 0.9rem;
-  color: #4e6e58;
+  margin-top: 1rem; /* Reduced margin */
+  font-size: 0.8rem; /* Reduced font size */
+  color: #4a5568;
 }
 
 .switchLink a {
-  color: #2e7d32;
+  color: #2c7a7b;
   font-weight: 600;
   text-decoration: none;
-  transition: color 0.3s ease;
 }
 
 .switchLink a:hover {
-  color: #1b5e20;
+  text-decoration: underline;
 }

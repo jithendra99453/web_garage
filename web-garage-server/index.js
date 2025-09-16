@@ -1,13 +1,25 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config();
+
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
+app.use(cors());
+app.use(express.json());
+
+// --- Database Connection (Updated) ---
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
+.then(() => console.log('Successfully connected to MongoDB Atlas!'))
+.catch((error) => console.error('Error connecting to MongoDB Atlas:', error));
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+// --- API Routes ---
+app.use('/api', authRoutes);
+
+// --- Start the Server ---
+app.listen(PORT, () => {
+  console.log(`Backend server is running on http://localhost:${PORT}`);
 });

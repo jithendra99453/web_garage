@@ -1,4 +1,4 @@
-/* Compact CSS for both SignUp forms */
+/* Login.module.css - Compact Version */
 
 .pageContainer {
   display: flex;
@@ -6,36 +6,36 @@
   align-items: center;
   min-height: 100vh;
   background-color: #f0f4f8;
-  padding: 1rem; /* Reduced padding */
+  padding: 1rem;
 }
 
 .formContainer {
   background-color: #ffffff;
-  padding: 1.5rem 2rem; /* Reduced padding */
-  border-radius: 8px; /* Slightly smaller radius */
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
-  max-width: 420px; /* Further reduced width */
+  max-width: 420px;
   width: 100%;
   text-align: center;
 }
 
 .title {
-  font-size: 1.5rem; /* Reduced font size */
+  font-size: 1.5rem;
   font-weight: 600;
   color: #1a202c;
-  margin-bottom: 0.25rem; /* Tighter spacing */
+  margin-bottom: 0.25rem;
 }
 
 .subtitle {
-  font-size: 0.9rem; /* Reduced font size */
+  font-size: 0.9rem;
   color: #4a5568;
-  margin-bottom: 1.5rem; /* Tighter spacing */
+  margin-bottom: 1.5rem;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* Reduced gap between form groups */
+  gap: 0.75rem;
   text-align: left;
 }
 
@@ -45,19 +45,19 @@
 }
 
 .formLabel {
-  font-size: 0.8rem; /* Reduced font size */
+  font-size: 0.8rem;
   font-weight: 500;
   color: #2d3748;
-  margin-bottom: 0.25rem; /* Tighter spacing */
+  margin-bottom: 0.25rem;
 }
 
 .formInput,
 .formSelect {
   width: 100%;
-  padding: 0.5rem 0.75rem; /* Reduced padding */
-  font-size: 0.9rem; /* Reduced font size */
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
   border: 1px solid #cbd5e0;
-  border-radius: 6px; /* Smaller radius */
+  border-radius: 6px;
   background-color: #f7fafc;
   color: #2d3748;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -72,8 +72,8 @@
 
 .submitButton {
   width: 100%;
-  padding: 0.6rem; /* Reduced padding */
-  font-size: 0.9rem; /* Reduced font size */
+  padding: 0.6rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #ffffff;
   background-color: #2c7a7b;
@@ -81,7 +81,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s;
-  margin-top: 0.75rem; /* Reduced margin */
+  margin-top: 0.75rem;
 }
 
 .submitButton:hover {
@@ -89,8 +89,8 @@
 }
 
 .switchLink {
-  margin-top: 1rem; /* Reduced margin */
-  font-size: 0.8rem; /* Reduced font size */
+  margin-top: 1rem;
+  font-size: 0.8rem;
   color: #4a5568;
 }
 

@@ -1,22 +1,28 @@
-import { useState } from 'react'
-import './index.css'
-import LandingPage from './components/LandingPage/LandingPage.jsx'
-import StudentSignUp from './components/StudentSignUp/StudentSignUp.jsx'; // Import the new student component
-import SchoolSignUp from './components/SchoolSignUp/SchoolSignUp.jsx';   // Import the new school/teacher component
+import React from 'react';
+import './index.css';
 import { Routes, Route } from 'react-router-dom';
+
+// Import your components
+import LandingPage from './components/LandingPage/LandingPage.jsx';
+import Login from './components/LoginForm/LoginForm.jsx'; // Assuming this is your Login component
+import StudentSignUp from './components/StudentSignUp/StudentSignUp.jsx';
+import SchoolSignUp from './components/SchoolSignUp/SchoolSignUp.jsx';
+
 function App() {
   return (
-     <Routes>
+    <Routes>
+      {/* Route for your main landing page */}
       <Route path="/" element={<LandingPage />} />
-      
-      {/* NEW, SEPARATE ROUTES */}
-      <Route path="/student-signup" element={<StudentSignUp />} />
-      <Route path="/school-signup" element={<SchoolSignUp />} />
 
-      {/* Your other routes */}
-      {/* <Route path="/login" element={<LoginPage />} /> */}
+      {/* Route for the login form */}
+      <Route path="/login" element={<Login />} />
+
+      {/* Routes for the sign-up forms that match our components */}
+      <Route path="/signup/student" element={<StudentSignUp />} />
+      <Route path="/signup/school" element={<SchoolSignUp />} />
+
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;

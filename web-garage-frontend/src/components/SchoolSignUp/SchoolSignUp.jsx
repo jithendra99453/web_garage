@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // 1. Import axios
 import styles from './SchoolSignUp.module.css';
-// Mock data for all institutions
+
+// Data and initial component setup remains the same...
 const allInstitutions = [
   'Greenwood High', 'Oakridge International', 'Delhi Public School',
   "St. Xavier's College", 'Loyola College', 'Christ University',
@@ -15,20 +17,32 @@ const SchoolSignUp = () => {
     password: '',
     school: '',
   });
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  // 2. Update the handleSubmit function
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting School/Teacher Data:", formData);
-    alert(`School account for ${formData.email} submitted!`);
+
+    try {
+      // Send the form data to the backend
+      const response = await axios.post('http://localhost:5000/api/register/school', formData);
+
+      console.log('Server response:', response.data.message);
+      alert('School account created successfully!');
+
+      // Redirect to the login page on success
+      navigate('/login?role=teacher');
+
+    } catch (error) {
+      console.error('Registration failed:', error.response ? error.response.data.message : error.message);
+      alert('Registration failed: ' + (error.response ? error.response.data.message : 'Please try again later.'));
+    }
   };
+
 
   return (
     <div className={styles.pageContainer}>
