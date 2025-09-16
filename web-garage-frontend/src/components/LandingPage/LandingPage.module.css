@@ -1,0 +1,174 @@
+/* Base Styles */
+.pageContainer {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #2c3e50;
+  background: linear-gradient(to bottom, #e8f5e9, #ffffff);
+  line-height: 1.6;
+  animation: fadeIn 1s ease-in;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Container Utility */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Hero Section */
+.heroSection {
+  background: url('/images/eco-hero-bg.jpg') no-repeat center center;
+  background-size: cover;
+  text-align: center;
+  padding: 5rem 2rem;
+  color: #ffffff;
+  position: relative;
+}
+
+.heroSection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 100, 0, 0.5);
+  z-index: 0;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+}
+
+.heroContent h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: slideUp 0.8s ease-out;
+}
+
+.tagline {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  animation: fadeIn 1.2s ease-in;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.ctaButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btnPrimary {
+  background-color: #43a047;
+  color: white;
+}
+
+.btnPrimary:hover {
+  background-color: #2e7d32;
+  transform: scale(1.05);
+}
+
+.btnSecondary {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+  border: 2px solid #2e7d32;
+}
+
+.btnSecondary:hover {
+  background-color: #a5d6a7;
+  transform: scale(1.05);
+}
+
+/* Section Styles */
+.section {
+  padding: 3rem 2rem;
+  background-color: #ffffff;
+}
+
+.sectionTitle {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+  animation: fadeIn 1s ease-in;
+}
+
+/* Features Grid */
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+/* Feature Card */
+.featureCard {
+  background-color: #f0f4c3;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeIn 1s ease-in;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.featureIcon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* Footer */
+.footer {
+  background-color: #2e7d32;
+  color: white;
+  padding: 2rem 1rem;
+  margin-top: 3rem;
+}
+
+.footerLinks {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.footerLinks a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.footerLinks a:hover {
+  text-decoration: underline;
+  color: #c8e6c9;
+}
+
+.copyright {
+  text-align: center;
+  font-size: 0.875rem;
+}
