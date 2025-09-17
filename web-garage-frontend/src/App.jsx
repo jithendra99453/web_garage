@@ -1,26 +1,29 @@
 import React from 'react';
-import './index.css';
 import { Routes, Route } from 'react-router-dom';
 
 // Import your components
 import LandingPage from './components/LandingPage/LandingPage.jsx';
-import Login from './components/LoginForm/LoginForm.jsx'; // Assuming this is your Login component
+import LoginForm from './components/LoginForm/LoginForm.jsx';
 import StudentSignUp from './components/StudentSignUp/StudentSignUp.jsx';
 import SchoolSignUp from './components/SchoolSignUp/SchoolSignUp.jsx';
+import StudentDashboard from './components/StudentDashboard/StudentDashboard.jsx'; // Your new dashboard
+import ProtectedRoute from './components/ProtectedRoute.jsx'; // The guard
 
 function App() {
   return (
     <Routes>
-      {/* Route for your main landing page */}
+      {/* --- Public Routes --- */}
       <Route path="/" element={<LandingPage />} />
-
-      {/* Route for the login form */}
-      <Route path="/login" element={<Login />} />
-
-      {/* Routes for the sign-up forms that match our components */}
+      <Route path="/login" element={<LoginForm />} />
       <Route path="/signup/student" element={<StudentSignUp />} />
       <Route path="/signup/school" element={<SchoolSignUp />} />
 
+      {/* --- Protected Routes --- */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/student-dashboard" element={<StudentDashboard />} />
+        {/* You can add more protected routes here, e.g., for the school dashboard */}
+        {/* <Route path="/school-dashboard" element={<SchoolDashboard />} /> */}
+      </Route>
     </Routes>
   );
 }

@@ -1,30 +1,37 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // Import useNavigate
-import styles from './LoginForm.module.css';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import axios from 'axios';
+import styles from './LoginForm.module.css'; // Renamed to match folder
 
 const LoginForm = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
-  const navigate = useNavigate(); // Initialize navigate
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const role = searchParams.get('role') || 'student'; // Default to student if no role is specified
+  const role = searchParams.get('role') || 'student';
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(`Logging in as ${role} with data:`, formData);
-    alert(`Login successful for ${formData.email}!`);
-    // In a real app, you would redirect after successful login: navigate('/dashboard');
+    const loginUrl = role === 'student' ? 'http://localhost:5000/api/login/student' : 'http://localhost:5000/api/login/school';
+    
+    try {
+      const response = await axios.post(loginUrl, formData);
+
+      // --- Store the JWT in local storage ---
+      localStorage.setItem('token', response.data.token);
+      
+      alert('Login successful!');
+      
+      // Redirect to the appropriate dashboard
+      navigate(role === 'student' ? '/student-dashboard' : '/school-dashboard');
+
+    } catch (error) {
+      console.error('Login failed:', error.response?.data.message || error.message);
+      alert('Login failed: ' + (error.response?.data.message || 'Please check your credentials.'));
+    }
   };
 
   // This function redirects the user to the correct sign-up page

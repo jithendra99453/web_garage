@@ -1,0 +1,338 @@
+import React, { useState } from 'react';
+import { 
+  Trophy, 
+  Zap, 
+  BookOpen, 
+  Users, 
+  Award, 
+  Leaf, 
+  Recycle, 
+  Calendar,
+  ExternalLink,
+  CheckCircle,
+  Lock,
+  Target,
+  TrendingDown,
+  Home,
+  User,
+  Settings,
+  LogOut,
+  Bell,
+  Menu,
+  X
+} from 'lucide-react';
+import styles from './StudentDashboard.module.css'; // This will now use your new CSS file
+
+const StudentDashboard = () => {
+  const [studyTaskCompleted, setStudyTaskCompleted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const studentData = {
+    name: "Alex Johnson",
+    level: 7,
+    currentXP: 2450,
+    nextLevelXP: 3000,
+    totalPoints: 18750,
+    co2Saved: 12.5,
+    plasticReduced: 3.2
+  };
+
+  const badges = [
+    { id: 1, name: "Recycling Hero", icon: "🏆", color: "badge-yellow" },
+    { id: 2, name: "Water Saver", icon: "💧", color: "badge-blue" },
+    { id: 3, name: "Energy Master", icon: "⚡", color: "badge-green" },
+    { id: 4, name: "Eco Warrior", icon: "🌱", color: "badge-emerald" }
+  ];
+
+  const upcomingTasks = [
+    { id: 1, title: "Segregate Waste Challenge", description: "Sort your household waste correctly for one week", deadline: "Due: Today, 17 Sep 2025", points: 150 },
+    { id: 2, title: "Plant a Tree", description: "Plant and document a tree in your neighborhood", deadline: "Due: This Week", points: 300 },
+    { id: 3, title: "Energy Audit", description: "Complete a home energy usage audit", deadline: "Due: Next Week", points: 200 }
+  ];
+
+  const newsItems = [
+    { id: 1, title: "New Recycling Initiative Launches in Hyderabad Schools", description: "Schools across the city are implementing advanced recycling programs to reduce waste.", date: "September 15, 2025", category: "Education" },
+    { id: 2, title: "Ocean Cleanup Project Shows Promising Results", description: "Latest data reveals significant plastic reduction in ocean cleanup zones.", date: "September 12, 2025", category: "Conservation" },
+    { id: 3, title: "Youth Climate Summit Registration Open", description: "Students can now register for the upcoming international youth climate action summit.", date: "September 10, 2025", category: "Events" }
+  ];
+
+  const progressPercentage = (studentData.currentXP / studentData.nextLevelXP) * 100;
+
+  const handleStudyTaskComplete = () => setStudyTaskCompleted(true);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  return (
+    <div className={styles['dashboard-container']}>
+      {/* Navigation Bar */}
+      <nav className={styles.navbar}>
+        <div className={styles['navbar-container']}>
+          <div className={styles['navbar-content']}>
+            {/* Logo */}
+            <div className={styles['logo-section']}>
+              <div className={styles['logo-icon']}>
+                <Leaf size={24} color="white" />
+              </div>
+              <span className={styles['logo-text']}>EcoLearn</span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className={styles['desktop-nav']}>
+              <button onClick={() => scrollToSection('dashboard-top')} className={`${styles['nav-button']} ${styles.active}`}>
+                <Home size={16} /><span>Dashboard</span>
+              </button>
+              <button onClick={() => scrollToSection('study-section')} className={styles['nav-button']}>
+                <BookOpen size={16} /><span>Study Tasks</span>
+              </button>
+              <button onClick={() => scrollToSection('challenges-section')} className={styles['nav-button']}>
+                <Target size={16} /><span>Challenges</span>
+              </button>
+              <button onClick={() => scrollToSection('news-section')} className={styles['nav-button']}>
+                <Leaf size={16} /><span>News</span>
+              </button>
+            </div>
+
+            {/* Desktop Right Side */}
+            <div className={styles['desktop-right']}>
+              <button className={styles['notification-btn']}>
+                <Bell size={20} />
+                <span className={styles['notification-badge']}>3</span>
+              </button>
+              <div className={styles['profile-section']}>
+                <div className={styles['profile-avatar']}>AJ</div>
+                <span>{studentData.name}</span>
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button onClick={toggleMobileMenu} className={styles['mobile-menu-btn']}>
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className={styles['mobile-menu']}>
+              <button onClick={() => scrollToSection('dashboard-top')} className={`${styles['nav-button']} ${styles.active}`}>
+                <Home size={16} /><span>Dashboard</span>
+              </button>
+              <button onClick={() => scrollToSection('study-section')} className={styles['nav-button']}>
+                <BookOpen size={16} /><span>Study Tasks</span>
+              </button>
+              <button onClick={() => scrollToSection('challenges-section')} className={styles['nav-button']}>
+                <Target size={16} /><span>Challenges</span>
+              </button>
+              <button onClick={() => scrollToSection('news-section')} className={styles['nav-button']}>
+                <Leaf size={16} /><span>News</span>
+              </button>
+              <div className={styles['mobile-nav-section']}>
+                <div className={styles['mobile-profile']}>
+                  <div className={styles['profile-avatar']}>AJ</div>
+                  <span>{studentData.name}</span>
+                </div>
+                <button className={styles['mobile-notification']}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Bell size={16} /><span>Notifications</span>
+                  </div>
+                  <span className={styles['notification-badge']}>3</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* Header */}
+      <header id="dashboard-top" className={styles.header}>
+        <div className={styles['header-container']}>
+          <div className={styles['header-content']}>
+            <div className={styles['welcome-section']}>
+              <h1>
+                Welcome back, <span className={styles['welcome-name']}>{studentData.name}</span>! 🌱
+              </h1>
+              <p className={styles['welcome-subtitle']}>Ready to make a difference today?</p>
+            </div>
+            <div className={styles['level-progress']}>
+              <div className={styles['level-info']}>
+                <span className={styles['level-text']}>Eco Level {studentData.level}</span>
+                <span className={styles['xp-text']}>{studentData.currentXP}/{studentData.nextLevelXP} XP</span>
+              </div>
+              <div className={styles['progress-bar']}>
+                <div className={styles['progress-fill']} style={{ width: `${progressPercentage}%` }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className={styles['main-content']}>
+        {/* Top Row - Points and Badges */}
+        <div className={styles['grid-3']}>
+          <div className={`${styles.card} ${styles['card-border-yellow']}`}>
+            <div className={styles['points-card']}>
+              <div className={styles['points-icon']}>
+                <Zap size={32} color="#d97706" />
+              </div>
+              <div>
+                <div className={styles['points-number']}>{studentData.totalPoints.toLocaleString()}</div>
+                <p className={styles['points-label']}>Eco Points Earned</p>
+              </div>
+            </div>
+          </div>
+          <div className={styles.card}>
+            <h3 className={styles['section-title']}>
+              <Award size={24} color="#059669" /> Your Eco Badges
+            </h3>
+            <div className={styles['badges-grid']}>
+              {badges.map((badge) => (
+                <div key={badge.id} className={`${styles['badge-item']} ${styles[badge.color]}`}>
+                  <div className={styles['badge-icon']}>{badge.icon}</div>
+                  <div className={styles['badge-name']}>{badge.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className={`${styles.card} ${styles['grid-1']}`}>
+          <h3 className={styles['section-title']}>Quick Actions</h3>
+          <div className={styles['actions-grid']}>
+            <button className={styles['action-btn']}>
+              <BookOpen size={20} /><span>Take a Quiz</span>
+            </button>
+            <button className={`${styles['action-btn']} ${styles.green}`}>
+              <Target size={20} /><span>Complete Challenge</span>
+            </button>
+            <button className={`${styles['action-btn']} ${styles.purple}`}>
+              <Users size={20} /><span>View Leaderboard</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Study Task Section */}
+        <div id="study-section" className={`${styles.card} ${styles['grid-1']}`}>
+          <h3 className={styles['section-title']}>
+            <BookOpen size={24} color="#2563eb" /> Today's Study Task
+          </h3>
+          <div className={styles['study-content']}>
+            <h4 className={styles['study-title']}>Understanding Carbon Footprints</h4>
+            <p className={styles['study-description']}>
+              Learn about carbon footprints and how individual actions impact the environment...
+            </p>
+            {!studyTaskCompleted ? (
+              <button onClick={handleStudyTaskComplete} className={styles['complete-btn']}>
+                <CheckCircle size={16} /><span>Mark as Completed</span>
+              </button>
+            ) : (
+              <div className={styles['completed-indicator']}>
+                <CheckCircle size={20} /><span>Completed! Great job! 🎉</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Upcoming Tasks Section */}
+        <div id="challenges-section" className={`${styles.card} ${styles['grid-1']}`}>
+          <h3 className={styles['section-title']}>
+            <Calendar size={24} color="#059669" /> Teacher-Assigned Tasks
+            {!studyTaskCompleted && <Lock size={16} color="#9ca3af" />}
+          </h3>
+          {!studyTaskCompleted ? (
+            <div className={styles['locked-section']}>
+              <Lock className={styles['lock-icon']} />
+              <p className={styles['locked-text']}>Complete your study task to unlock challenges!</p>
+            </div>
+          ) : (
+            <div className={styles['tasks-grid']}>
+              {upcomingTasks.map((task) => (
+                <div key={task.id} className={styles['task-card']}>
+                  <h4 className={styles['task-title']}>{task.title}</h4>
+                  <p className={styles['task-description']}>{task.description}</p>
+                  <div className={styles['task-footer']}>
+                    <span className={styles['task-deadline']}>{task.deadline}</span>
+                    <span className={styles['task-points']}>+{task.points} pts</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles['grid-2']}>
+          {/* Environmental News */}
+          <div id="news-section" className={styles.card}>
+            <h3 className={styles['section-title']}>
+              <Leaf size={24} color="#059669" /> Environmental News
+            </h3>
+            <div className={styles['news-list']}>
+              {newsItems.map((item) => (
+                <div key={item.id} className={styles['news-item']}>
+                  <div className={styles['news-header']}>
+                    <h4 className={styles['news-title']}>{item.title}</h4>
+                    <span className={styles['news-category']}>{item.category}</span>
+                  </div>
+                  <p className={styles['news-description']}>{item.description}</p>
+                  <div className={styles['news-footer']}>
+                    <span className={styles['news-date']}>{item.date}</span>
+                    <a href="#" className={styles['read-more']}>
+                      <span>Read More</span><ExternalLink size={12} />
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Environmental Impact */}
+          <div className={styles.card}>
+            <h3 className={styles['section-title']}>
+              <TrendingDown size={24} color="#059669" /> Your Environmental Impact
+            </h3>
+            <div className={styles['impact-stats']}>
+              <div className={`${styles['stat-card']} ${styles.green}`}>
+                <div className={styles['stat-header']}>
+                  <div className={styles['stat-label-section']}>
+                    <div className={`${styles['stat-icon']} ${styles.green}`}><Leaf size={16} /></div>
+                    <span className={styles['stat-label']}>CO₂ Saved</span>
+                  </div>
+                  <span className={`${styles['stat-value']} ${styles.green}`}>{studentData.co2Saved} kg</span>
+                </div>
+                <p className={styles['stat-description']}>Equivalent to planting 3 trees this month!</p>
+              </div>
+              <div className={`${styles['stat-card']} ${styles.blue}`}>
+                <div className={styles['stat-header']}>
+                  <div className={styles['stat-label-section']}>
+                    <div className={`${styles['stat-icon']} ${styles.blue}`}><Recycle size={16} /></div>
+                    <span className={styles['stat-label']}>Plastic Reduced</span>
+                  </div>
+                  <span className={`${styles['stat-value']} ${styles.blue}`}>{studentData.plasticReduced} kg</span>
+                </div>
+                <p className={styles['stat-description']}>That's 160 plastic bottles diverted from landfills!</p>
+              </div>
+              <div className={`${styles['stat-card']} ${styles.purple}`}>
+                <div className={styles['stat-header']}>
+                  <span className={styles['stat-label']}>Weekly Goal Progress</span>
+                  <span className={`${styles['stat-value']} ${styles.purple}`}>73%</span>
+                </div>
+                <div className={styles['goal-progress']}>
+                  <div className={styles['goal-fill']} style={{ width: '73%' }}></div>
+                </div>
+                <p className={styles['stat-description']}>Keep going! You're doing great this week.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default StudentDashboard;
