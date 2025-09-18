@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# production builds
+dist/
+build/
+
+# environment variables
+.env
+.env.local
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# misc
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
