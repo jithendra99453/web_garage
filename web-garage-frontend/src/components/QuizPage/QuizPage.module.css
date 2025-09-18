@@ -1,0 +1,623 @@
+/* Container and Layout */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f3ff 100%);
+  padding: 1rem;
+}
+
+.maxWidth {
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+/* Loading States */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid transparent;
+  border-bottom: 2px solid #16a34a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  color: #15803d;
+  font-weight: 500;
+}
+
+/* Header Section */
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leafIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #16a34a;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #15803d;
+  margin: 0;
+}
+
+.statsSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pointsBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fef3c7;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.timerBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fee2e2;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.badgeIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.pointsBadge .badgeIcon {
+  color: #d97706;
+}
+
+.timerBadge .badgeIcon {
+  color: #dc2626;
+}
+
+.badgeText {
+  font-weight: 500;
+}
+
+.pointsBadge .badgeText {
+  color: #92400e;
+}
+
+.timerBadge .badgeText {
+  color: #991b1b;
+}
+
+/* Progress Bar */
+.progressContainer {
+  width: 100%;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  height: 0.75rem;
+}
+
+.progressBar {
+  background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease-in-out;
+}
+
+.progressText {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+/* Question Card */
+.questionCard {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.questionText {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .optionsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Option Buttons */
+.optionButton {
+  width: 100%;
+  padding: 1rem;
+  text-align: left;
+  border-radius: 0.75rem;
+  border: 2px solid;
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #374751;
+  cursor: pointer;
+}
+
+.optionButton:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.optionButton:disabled {
+  cursor: not-allowed;
+}
+
+.selectedOption {
+  background: #dbeafe !important;
+  border-color: #3b82f6 !important;
+  color: #1e40af !important;
+}
+
+.correctOption {
+  background: #d1fae5 !important;
+  border-color: #10b981 !important;
+  color: #065f46 !important;
+}
+
+.incorrectOption {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
+.disabledOption {
+  background: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  color: #6b7280 !important;
+}
+
+.optionContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.optionLetter {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* Feedback Card */
+.feedbackCard {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.feedbackHeader {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.correctFeedback {
+  color: #15803d;
+}
+
+.incorrectFeedback {
+  color: #dc2626;
+}
+
+.feedbackTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.pointsEarned {
+  color: #16a34a;
+  font-weight: 500;
+  margin: 0;
+}
+
+.explanationBox {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.explanationTitle {
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 0.25rem;
+}
+
+.explanationText {
+  color: #1d4ed8;
+  margin: 0;
+}
+
+.nextButtonContainer {
+  text-align: center;
+}
+
+.nextButton {
+  background: #16a34a;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nextButton:hover {
+  background: #15803d;
+}
+
+.buttonIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Results Page */
+.resultsCard {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 2rem;
+  text-align: center;
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.resultsHeader {
+  margin-bottom: 1.5rem;
+}
+
+.awardIcon {
+  width: 4rem;
+  height: 4rem;
+  color: #eab308;
+  margin: 0 auto 1rem;
+}
+
+.resultsTitle {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #15803d;
+  margin-bottom: 0.5rem;
+}
+
+.levelUpBanner {
+  background: #fef3c7;
+  border: 2px solid #fbbf24;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.levelUpText {
+  color: #92400e;
+  font-weight: bold;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.statCard {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.statCard:nth-child(1) {
+  background: #dcfce7;
+}
+
+.statCard:nth-child(2) {
+  background: #dbeafe;
+}
+
+.statCard:nth-child(3) {
+  background: #f3e8ff;
+}
+
+.statIcon {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto 0.5rem;
+}
+
+.statCard:nth-child(1) .statIcon {
+  color: #16a34a;
+}
+
+.statCard:nth-child(2) .statIcon {
+  color: #2563eb;
+}
+
+.levelIcon {
+  width: 2rem;
+  height: 2rem;
+  background: #7c3aed;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+}
+
+.levelNumber {
+  color: white;
+  font-weight: bold;
+}
+
+.statLabel {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.statCard:nth-child(1) .statLabel {
+  color: #15803d;
+}
+
+.statCard:nth-child(2) .statLabel {
+  color: #1e40af;
+}
+
+.statCard:nth-child(3) .statLabel {
+  color: #7c2d12;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.statCard:nth-child(1) .statValue {
+  color: #16a34a;
+}
+
+.statCard:nth-child(2) .statValue {
+  color: #2563eb;
+}
+
+.statCard:nth-child(3) .statValue {
+  color: #7c3aed;
+}
+
+.finalMessage {
+  margin-bottom: 1.5rem;
+}
+
+.performanceMessage {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.summaryText {
+  color: #6b7280;
+  margin: 0;
+}
+
+.restartButton {
+  background: #16a34a;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.restartButton:hover {
+  background: #15803d;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .questionCard {
+    padding: 1.5rem;
+  }
+  
+  .questionText {
+    font-size: 1.25rem;
+  }
+  
+  .headerTop {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .titleSection {
+    justify-content: center;
+  }
+  
+  .statsSection {
+    justify-content: center;
+  }
+  
+  .resultsCard {
+    padding: 1.5rem;
+  }
+  
+  .resultsTitle {
+    font-size: 1.5rem;
+  }
+  
+  .awardIcon {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+/* Animation Classes */
+.fadeIn {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slideIn {
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Focus States for Accessibility */
+.optionButton:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.nextButton:focus,
+.restartButton:focus {
+  outline: 2px solid #15803d;
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .optionButton {
+    border-width: 3px;
+  }
+  
+  .progressBar {
+    background: #000;
+  }
+  
+  .correctOption {
+    background: #90ee90 !important;
+    color: #000 !important;
+  }
+  
+  .incorrectOption {
+    background: #ffb6c1 !important;
+    color: #000 !important;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border: 2px solid #16a34a;
+  }
+  
+  .progressBar {
+    transition: none;
+  }
+  
+  .optionButton {
+    transition: none;
+  }
+  
+  .nextButton,
+  .restartButton {
+    transition: none;
+  }
+  
+  .fadeIn,
+  .slideIn {
+    animation: none;
+  }
+}

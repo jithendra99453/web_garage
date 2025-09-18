@@ -34,7 +34,7 @@ const LandingPage = () => {
       {/* Hero Section */}
       <header className={styles.heroSection}>
         <div className={`${styles.container} ${styles.heroContent}`}>
-          <h1>EcoQuest</h1>
+          <h1>EcoLearn</h1>
           <p className={styles.tagline}>Learn. Play. Act. Save the Planet.</p>
           <div className={styles.ctaButtons}>
             {/* UPDATED LINK for students */}

@@ -22,19 +22,20 @@ import {
   X
 } from 'lucide-react';
 import styles from './StudentDashboard.module.css'; // This will now use your new CSS file
+import { Link } from 'react-router-dom';
 
 const StudentDashboard = () => {
   const [studyTaskCompleted, setStudyTaskCompleted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const studentData = {
-    name: "Alex Johnson",
-    level: 7,
-    currentXP: 2450,
-    nextLevelXP: 3000,
-    totalPoints: 18750,
-    co2Saved: 12.5,
-    plasticReduced: 3.2
+    name: "charan",
+    level: 0,
+    currentXP: 0,
+    nextLevelXP: 0,
+    totalPoints: 0,
+    co2Saved: 0,
+    plasticReduced: 0
   };
 
   const badges = [
@@ -205,9 +206,9 @@ const StudentDashboard = () => {
         <div className={`${styles.card} ${styles['grid-1']}`}>
           <h3 className={styles['section-title']}>Quick Actions</h3>
           <div className={styles['actions-grid']}>
-            <button className={styles['action-btn']}>
-              <BookOpen size={20} /><span>Take a Quiz</span>
-            </button>
+            <Link to='/student/quiz' className={styles['action-btn']}>
+               <BookOpen size={20} /><span>Take a Quiz</span>
+            </Link>
             <button className={`${styles['action-btn']} ${styles.green}`}>
               <Target size={20} /><span>Complete Challenge</span>
             </button>
