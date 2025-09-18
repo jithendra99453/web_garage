@@ -26,7 +26,7 @@ const LoginForm = () => {
       alert('Login successful!');
       
       // Redirect to the appropriate dashboard
-      navigate(role === 'student' ? '/student-dashboard' : '/school-dashboard');
+      navigate(role === 'student' ? '/student-dashboard' : '/teacher-dashboard');
 
     } catch (error) {
       console.error('Login failed:', error.response?.data.message || error.message);

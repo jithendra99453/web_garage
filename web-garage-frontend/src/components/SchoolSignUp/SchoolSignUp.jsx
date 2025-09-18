@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // 1. Import axios
+import axios from 'axios';
 import styles from './SchoolSignUp.module.css';
-
-// Data and initial component setup remains the same...
-const allInstitutions = [
-  'Greenwood High', 'Oakridge International', 'Delhi Public School',
-  "St. Xavier's College", 'Loyola College', 'Christ University',
-  'IIT Bombay', 'University of Hyderabad', 'BITS Pilani',
-  'IIM Ahmedabad', 'Jawaharlal Nehru University', 'Tata Institute of Social Sciences'
-];
 
 const SchoolSignUp = () => {
   const [formData, setFormData] = useState({
@@ -17,24 +9,22 @@ const SchoolSignUp = () => {
     password: '',
     school: '',
   });
+
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // 2. Update the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Send the form data to the backend
       const response = await axios.post('http://localhost:5000/api/register/school', formData);
 
       console.log('Server response:', response.data.message);
       alert('School account created successfully!');
 
-      // Redirect to the login page on success
       navigate('/login?role=teacher');
 
     } catch (error) {
@@ -43,27 +33,23 @@ const SchoolSignUp = () => {
     }
   };
 
-
   return (
     <div className={styles.pageContainer}>
       <div className={styles.formContainer}>
-        <h2 className={styles.title}>School & Teacher Onboarding</h2>
-        <p className={styles.subtitle}>Register your institution with EcoQuest</p>
+        <h2 className={styles.title}>Teacher / School Sign Up</h2>
+        <p className={styles.subtitle}>Create your EcoQuest Teacher Account</p>
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel} htmlFor="email">Official Email Address</label>
+            <label className={styles.formLabel} htmlFor="email">Email Address</label>
             <input type="email" id="email" name="email" className={styles.formInput} value={formData.email} onChange={handleInputChange} required />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel} htmlFor="password">Create a Password</label>
+            <label className={styles.formLabel} htmlFor="password">Password</label>
             <input type="password" id="password" name="password" className={styles.formInput} value={formData.password} onChange={handleInputChange} required />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel} htmlFor="school">Select Institution</label>
-            <select id="school" name="school" className={styles.formSelect} value={formData.school} onChange={handleInputChange} required>
-              <option value="" disabled>-- Select your institution --</option>
-              {allInstitutions.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+            <label className={styles.formLabel} htmlFor="school">School Name</label>
+            <input type="text" id="school" name="school" className={styles.formInput} value={formData.school} onChange={handleInputChange} required />
           </div>
           <button type="submit" className={styles.submitButton}>Create Account</button>
         </form>
