@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  Trophy, 
-  Zap, 
-  BookOpen, 
-  Users, 
-  Award, 
-  Leaf, 
-  Recycle, 
+import {
+  Trophy,
+  Zap,
+  BookOpen,
+  Users,
+  Award,
+  Leaf,
+  Recycle,
   Calendar,
   ExternalLink,
   CheckCircle,
@@ -19,7 +19,13 @@ import {
   LogOut,
   Bell,
   Menu,
-  X
+  X,
+  Puzzle,
+  Brain,
+  HelpCircle,
+  Search,
+  Trash2,
+  Sun
 } from 'lucide-react';
 import styles from './StudentDashboard.module.css'; // This will now use your new CSS file
 import { Link } from 'react-router-dom';
@@ -204,17 +210,65 @@ const StudentDashboard = () => {
 
         {/* Quick Actions */}
         <div className={`${styles.card} ${styles['grid-1']}`}>
-          <h3 className={styles['section-title']}>Quick Actions</h3>
+          <h3 className={styles['section-title']}>Eco Games</h3>
           <div className={styles['actions-grid']}>
-            <Link to='/student/quiz' className={styles['action-btn']}>
-               <BookOpen size={20} /><span>Take a Quiz</span>
+            <Link to='/student/puzzle' className={styles['action-btn']}>
+               <Puzzle size={20} /><span>Eco Puzzle</span>
             </Link>
-            <button className={`${styles['action-btn']} ${styles.green}`}>
-              <Target size={20} /><span>Complete Challenge</span>
-            </button>
-            <button className={`${styles['action-btn']} ${styles.purple}`}>
-              <Users size={20} /><span>View Leaderboard</span>
-            </button>
+            <Link to='/student/memory' className={`${styles['action-btn']} ${styles.green}`}>
+              <Brain size={20} /><span>Memory Game</span>
+            </Link>
+            <Link to='/student/trivia' className={`${styles['action-btn']} ${styles.purple}`}>
+              <HelpCircle size={20} /><span>Eco Trivia</span>
+            </Link>
+            <Link to='/student/wordsearch' className={`${styles['action-btn']} ${styles.blue}`}>
+              <Search size={20} /><span>Word Search</span>
+            </Link>
+            <Link to='/student/matching' className={`${styles['action-btn']} ${styles.yellow}`}>
+              <Puzzle size={20} /><span>Matching Game</span>
+            </Link>
+            <Link to='/student/sorting' className={`${styles['action-btn']} ${styles.red}`}>
+              <Trash2 size={20} /><span>Sorting Game</span>
+            </Link>
+            <Link to='/student/bingo' className={`${styles['action-btn']} ${styles.emerald}`}>
+              <Trophy size={20} /><span>Eco Bingo</span>
+            </Link>
+            <Link to='/student/carbon' className={`${styles['action-btn']} ${styles.teal}`}>
+              <TrendingDown size={20} /><span>Carbon Calculator</span>
+            </Link>
+            <Link to='/student/recycle' className={`${styles['action-btn']} ${styles.cyan}`}>
+              <Recycle size={20} /><span>Recycle Sort</span>
+            </Link>
+            <Link to='/student/water' className={`${styles['action-btn']} ${styles.sky}`}>
+              <Users size={20} /><span>Water Saver</span>
+            </Link>
+            <Link to='/student/energy' className={`${styles['action-btn']} ${styles.indigo}`}>
+              <Zap size={20} /><span>Energy Quiz</span>
+            </Link>
+            <Link to='/student/wildlife' className={`${styles['action-btn']} ${styles.violet}`}>
+              <Award size={20} /><span>Wildlife Match</span>
+            </Link>
+            <Link to='/student/climate' className={`${styles['action-btn']} ${styles.fuchsia}`}>
+              <Leaf size={20} /><span>Climate Challenge</span>
+            </Link>
+            <Link to='/student/garden' className={`${styles['action-btn']} ${styles.rose}`}>
+              <Home size={20} /><span>Garden Planner</span>
+            </Link>
+            <Link to='/student/waste' className={`${styles['action-btn']} ${styles.amber}`}>
+              <Trash2 size={20} /><span>Waste Audit</span>
+            </Link>
+            <Link to='/student/sustainability' className={`${styles['action-btn']} ${styles.lime}`}>
+              <BookOpen size={20} /><span>Sustainability Trivia</span>
+            </Link>
+            <Link to='/student/foodwaste' className={`${styles['action-btn']} ${styles.orange}`}>
+              <Target size={20} /><span>Food Waste Game</span>
+            </Link>
+            <Link to='/student/pollution' className={`${styles['action-btn']} ${styles.stone}`}>
+              <Settings size={20} /><span>Pollution Puzzle</span>
+            </Link>
+            <Link to='/student/solar' className={`${styles['action-btn']} ${styles.neutral}`}>
+              <Sun size={20} /><span>Solar Simulator</span>
+            </Link>
           </div>
         </div>
 
