@@ -95,66 +95,75 @@ router.post('/login/student', async (req, res) => {
 
 
 // ===============================================
-//          SCHOOL/TEACHER AUTHENTICATION ROUTES
+//          TEACHER/SCHOOL ROUTES
 // ===============================================
 
 // @route   POST /api/register/school
-// @desc    Register a new school/teacher
+// @desc    Register a new teacher account
 router.post('/register/school', async (req, res) => {
     const { email, password, school } = req.body;
 
     try {
-        let schoolUser = await School.findOne({ email });
-        if (schoolUser) {
+        // Check if a user with this email already exists
+        let user = await School.findOne({ email });
+        if (user) {
             return res.status(400).json({ message: 'A user with this email already exists.' });
         }
 
+        // Hash the password for security
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        schoolUser = new School({
+        // Create a new user instance
+        user = new School({
             email,
             password: hashedPassword,
             school,
         });
 
-        await schoolUser.save();
+        // Save the new user to the database
+        await user.save();
 
-        res.status(201).json({ message: 'School account registered successfully!' });
+        res.status(201).json({ message: 'Teacher account registered successfully!' });
 
     } catch (error) {
-        console.error('School registration error:', error.message);
-        res.status(500).json({ message: 'Server error during school registration.' });
+        console.error('Teacher registration error:', error.message);
+        res.status(500).json({ message: 'Server error during registration.' });
     }
 });
 
 // @route   POST /api/login/school
-// @desc    Authenticate a school/teacher and return a JWT
+// @desc    Authenticate a teacher and return a JWT for dashboard access
 router.post('/login/school', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const schoolUser = await School.findOne({ email });
-        if (!schoolUser) {
-            return res.status(400).json({ message: 'Invalid credentials.' });
+        // Find the user by their email address
+        const user = await School.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid credentials. Please try again.' });
         }
 
-        const isMatch = await bcrypt.compare(password, schoolUser.password);
+        // Compare the submitted password with the hashed password in the database
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials.' });
+            return res.status(400).json({ message: 'Invalid credentials. Please try again.' });
         }
 
+        // If credentials are correct, create the JWT payload
         const payload = {
             user: {
-                id: schoolUser.id,
+                id: user.id,
                 role: 'teacher',
+                school: user.school // Include school name in the token
             },
         };
 
+        // Sign the token and send it back to the frontend
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: '1h' },
+            { expiresIn: '1h' }, // Token is valid for 1 hour
             (err, token) => {
                 if (err) throw err;
                 res.json({ token });
@@ -162,10 +171,13 @@ router.post('/login/school', async (req, res) => {
         );
 
     } catch (error) {
-        console.error('School login error:', error.message);
-        res.status(500).json({ message: 'Server error during school login.' });
+        console.error('Teacher login error:', error.message);
+        res.status(500).json({ message: 'Server error during login.' });
     }
 });
+
+// Include your student routes as well if they are in the same file
+// ...
 
 
 module.exports = router;

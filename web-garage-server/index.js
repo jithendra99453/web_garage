@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -5,7 +6,6 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const quizRoutes = require('./routes/QuizRoutes');
 
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,8 +19,8 @@ mongoose.connect(process.env.MONGO_URI)
 .catch((error) => console.error('Error connecting to MongoDB Atlas:', error));
 
 // --- API Routes ---
-app.use('/api', authRoutes);
 app.use('/api/quiz', quizRoutes);
+app.use('/api', authRoutes);
 
 // --- Start the Server ---
 app.listen(PORT, () => {
