@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Leaf, Award, ChevronRight, RotateCcw } from 'lucide-react';
 import axios from 'axios';
+
 const EcoQuiz = () => {
   // Quiz state management
   const [questions, setQuestions] = useState([]);
@@ -369,92 +370,48 @@ const EcoQuiz = () => {
       correctAnswer: 2,
       explanation: "Only about 3% of Earth's water is freshwater, and most of that is frozen in ice caps and glaciers!"
     },
-    {
-      question: "Which greenhouse gas is most abundant in the atmosphere?",
-      options: ["Carbon dioxide", "Methane", "Water vapor", "Nitrous oxide"],
-      correctAnswer: 2,
-      explanation: "Water vapor is actually the most abundant greenhouse gas, though CO2 is the most significant human-contributed one."
-    },
-    {
-      question: "How long does it take for a plastic bottle to decompose?",
-      options: ["10 years", "50 years", "450 years", "1000 years"],
-      correctAnswer: 2,
-      explanation: "Plastic bottles can take up to 450 years to decompose completely in landfills!"
-    },
-    {
-      question: "What is the most effective way to reduce your carbon footprint?",
-      options: ["Recycling", "Using LED bulbs", "Reducing meat consumption", "Taking shorter showers"],
-      correctAnswer: 2,
-      explanation: "Reducing meat consumption, especially beef, can significantly lower your carbon footprint due to methane emissions from livestock."
-    },
-    {
-      question: "Which renewable energy source generates the most electricity globally?",
-      options: ["Solar", "Wind", "Hydroelectric", "Geothermal"],
-      correctAnswer: 2,
-      explanation: "Hydroelectric power is currently the largest source of renewable electricity worldwide."
-    },
-    {
-      question: "What percentage of waste can typically be recycled or composted?",
-      options: ["25%", "50%", "75%", "90%"],
-      correctAnswer: 2,
-      explanation: "Studies show that up to 75% of household waste can be recycled or composted instead of going to landfills."
-    },
-    {
-      question: "Which transportation method produces the least CO2 per passenger mile?",
-      options: ["Car", "Bus", "Train", "Airplane"],
-      correctAnswer: 2,
-      explanation: "Trains are generally the most efficient form of transportation for long distances, producing the least CO2 per passenger mile."
-    },
-    {
-      question: "How much energy can proper insulation save in a home?",
-      options: ["5-10%", "15-20%", "30-50%", "60-70%"],
-      correctAnswer: 2,
-      explanation: "Proper insulation can reduce heating and cooling energy use by 30-50%, making it one of the most cost-effective improvements."
-    },
-    {
-      question: "What is the primary cause of ocean acidification?",
-      options: ["Industrial waste", "Plastic pollution", "CO2 absorption", "Oil spills"],
-      correctAnswer: 2,
-      explanation: "Ocean acidification is primarily caused by the ocean absorbing excess CO2 from the atmosphere, forming carbonic acid."
-    },
-    {
-      question: "Which ecosystem stores the most carbon per acre?",
-      options: ["Grasslands", "Forests", "Wetlands", "Deserts"],
-      correctAnswer: 2,
-      explanation: "Wetlands store more carbon per acre than any other ecosystem, making their conservation crucial for climate regulation."
-    }
+    // Add more fallback questions if needed
   ];
 
-  // Simulate API call to Gemini
-  // Add axios to your imports if it's not already there
+  // API call to Gemini
+  // In EcoQuiz.jsx
 
-// ... inside your EcoQuiz component
-
-// Modify the fetchQuizQuestions function
 const fetchQuizQuestions = async () => {
   setIsLoading(true);
   try {
-    // Call your new backend endpoint
     const response = await axios.get('http://localhost:5000/api/quiz/generate');
-    
-    // Make sure the data is in the expected format
-    if (response.data && Array.isArray(response.data)) {
-      setQuestions(response.data);
+
+    if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+      
+      // --- DATA TRANSFORMATION AND VALIDATION ---
+      const transformedQuestions = response.data.map(q => {
+        // If the API gives an 'answer' string but no 'correctAnswer' index, create it.
+        if (q.answer && typeof q.correctAnswer === 'undefined') {
+          const correctIndex = q.options.findIndex(opt => opt === q.answer);
+          return {
+            ...q,
+            correctAnswer: correctIndex,
+            // Ensure an explanation field exists, even if it's generic
+            explanation: q.explanation || "No explanation provided." 
+          };
+        }
+        // Ensure explanation exists on all questions
+        return { ...q, explanation: q.explanation || "No explanation provided." };
+      });
+
+      setQuestions(transformedQuestions);
+
     } else {
-      // If the API returns unexpected data, use the fallback
-      console.error('API response was not an array, using fallback data.');
+      console.error('API did not return valid questions, using fallback data.');
       setQuestions(fallbackQuestions);
     }
-
   } catch (error) {
     console.error('API call failed, using fallback data:', error);
-    setQuestions(fallbackQuestions); // Use fallback data on error
+    setQuestions(fallbackQuestions);
   } finally {
     setIsLoading(false);
   }
 };
-
-// The rest of your component (useEffect hooks, handlers, JSX) remains the same.
 
 
   // Timer effect
@@ -498,7 +455,6 @@ const fetchQuizQuestions = async () => {
       const newPoints = ecoPoints + 10;
       setEcoPoints(newPoints);
       
-      // Check for level up
       const newLevel = calculateLevel(newPoints);
       if (newLevel > userLevel) {
         setUserLevel(newLevel);
@@ -562,6 +518,16 @@ const fetchQuizQuestions = async () => {
           </div>
         </div>
       </>
+    );
+  }
+
+  if (!questions || questions.length === 0) {
+    return (
+        <div style={styles.container}>
+            <div style={styles.loadingContainer}>
+                <p style={styles.loadingText}>Could not load quiz questions. Please try again later.</p>
+            </div>
+        </div>
     );
   }
 

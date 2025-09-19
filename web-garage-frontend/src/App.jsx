@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 // Import your components
+import ProfilePage from './components/Profile/Profile.jsx'; // 1. Import the new Profile component
 import LandingPage from './components/LandingPage/LandingPage.jsx';
 import LoginForm from './components/LoginForm/LoginForm.jsx';
 import StudentSignUp from './components/StudentSignUp/StudentSignUp.jsx';
@@ -50,6 +51,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/student/quiz" element={<QuizPage />} />
         <Route path="/student/puzzle" element={<EcoPuzzle />} />
         <Route path="/student/memory" element={<EcoMemoryGame />} />

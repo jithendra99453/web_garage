@@ -1,48 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Trophy,
-  Zap,
-  BookOpen,
-  Users,
-  Award,
-  Leaf,
-  Recycle,
-  Calendar,
-  ExternalLink,
-  CheckCircle,
-  Lock,
-  Target,
-  TrendingDown,
-  Home,
-  User,
-  Settings,
-  LogOut,
-  Bell,
-  Menu,
-  X,
-  Puzzle,
-  Brain,
-  HelpCircle,
-  Search,
-  Trash2,
-  Sun
+  Trophy, Zap, BookOpen, Users, Award, Leaf, Recycle, Calendar, 
+  ExternalLink, CheckCircle, Lock, Target, TrendingDown, Home, 
+  User, Settings, LogOut, Bell, Menu, X, Puzzle, Brain, 
+  HelpCircle, Search, Trash2, Sun
 } from 'lucide-react';
-import styles from './StudentDashboard.module.css'; // This will now use your new CSS file
-import { Link } from 'react-router-dom';
+import styles from './StudentDashboard.module.css';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const StudentDashboard = () => {
-  const [studyTaskCompleted, setStudyTaskCompleted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  const studentData = {
-    name: "charan",
-    level: 0,
-    currentXP: 0,
-    nextLevelXP: 0,
-    totalPoints: 0,
-    co2Saved: 0,
-    plasticReduced: 0
-  };
+  const [studyTaskCompleted, setStudyTaskCompleted] = useState(false);
+  const [studentData, setStudentData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      
+      axios.defaults.headers.common['x-auth-token'] = token;
+      try {
+        const res = await axios.get('http://localhost:5000/api/profile');
+        
+        // Ensure default values for gamification fields to prevent crashes
+        const completeStudentData = {
+          totalPoints: 0,
+          currentXP: 0,
+          nextLevelXP: 100,
+          co2Saved: 0,
+          plasticReduced: 0,
+          level: 1,
+          ...res.data
+        };
+        setStudentData(completeStudentData);
+
+      } catch (err) {
+        console.error('Failed to fetch user data', err);
+        localStorage.removeItem('token');
+        navigate('/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudentData();
+  }, [navigate]);
 
   const badges = [
     { id: 1, name: "Recycling Hero", icon: "🏆", color: "badge-yellow" },
@@ -52,22 +60,16 @@ const StudentDashboard = () => {
   ];
 
   const upcomingTasks = [
-    { id: 1, title: "Segregate Waste Challenge", description: "Sort your household waste correctly for one week", deadline: "Due: Today, 17 Sep 2025", points: 150 },
-    { id: 2, title: "Plant a Tree", description: "Plant and document a tree in your neighborhood", deadline: "Due: This Week", points: 300 },
-    { id: 3, title: "Energy Audit", description: "Complete a home energy usage audit", deadline: "Due: Next Week", points: 200 }
+    { id: 1, title: "Segregate Waste Challenge", description: "Sort your household waste correctly for one week", deadline: "Due: Today, 19 Sep 2025", points: 150 },
   ];
 
   const newsItems = [
-    { id: 1, title: "New Recycling Initiative Launches in Hyderabad Schools", description: "Schools across the city are implementing advanced recycling programs to reduce waste.", date: "September 15, 2025", category: "Education" },
-    { id: 2, title: "Ocean Cleanup Project Shows Promising Results", description: "Latest data reveals significant plastic reduction in ocean cleanup zones.", date: "September 12, 2025", category: "Conservation" },
-    { id: 3, title: "Youth Climate Summit Registration Open", description: "Students can now register for the upcoming international youth climate action summit.", date: "September 10, 2025", category: "Events" }
+    { id: 1, title: "New Recycling Initiative Launches in Hyderabad", description: "Schools across the city are implementing advanced recycling programs.", date: "September 15, 2025", category: "Education" },
   ];
-
-  const progressPercentage = (studentData.currentXP / studentData.nextLevelXP) * 100;
 
   const handleStudyTaskComplete = () => setStudyTaskCompleted(true);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-
+  
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -75,79 +77,64 @@ const StudentDashboard = () => {
     }
     setIsMobileMenuOpen(false);
   };
+  
+  if (isLoading || !studentData) {
+    return (
+      <div className={styles['loading-container']}>
+        <div className={styles.spinner}></div>
+      </div>
+    );
+  }
+  
+  const progressPercentage = (studentData.currentXP / studentData.nextLevelXP) * 100 || 0;
 
   return (
     <div className={styles['dashboard-container']}>
-      {/* Navigation Bar */}
       <nav className={styles.navbar}>
         <div className={styles['navbar-container']}>
           <div className={styles['navbar-content']}>
-            {/* Logo */}
             <div className={styles['logo-section']}>
-              <div className={styles['logo-icon']}>
-                <Leaf size={24} color="white" />
-              </div>
+              <div className={styles['logo-icon']}><Leaf size={24} color="white" /></div>
               <span className={styles['logo-text']}>EcoLearn</span>
             </div>
-
-            {/* Desktop Navigation */}
+            
             <div className={styles['desktop-nav']}>
-              <button onClick={() => scrollToSection('dashboard-top')} className={`${styles['nav-button']} ${styles.active}`}>
-                <Home size={16} /><span>Dashboard</span>
-              </button>
-              <button onClick={() => scrollToSection('study-section')} className={styles['nav-button']}>
-                <BookOpen size={16} /><span>Study Tasks</span>
-              </button>
-              <button onClick={() => scrollToSection('challenges-section')} className={styles['nav-button']}>
-                <Target size={16} /><span>Challenges</span>
-              </button>
-              <button onClick={() => scrollToSection('news-section')} className={styles['nav-button']}>
-                <Leaf size={16} /><span>News</span>
-              </button>
+              <button onClick={() => scrollToSection('dashboard-top')} className={`${styles['nav-button']} ${styles.active}`}><Home size={16} /><span>Dashboard</span></button>
+              <button onClick={() => scrollToSection('study-section')} className={styles['nav-button']}><BookOpen size={16} /><span>Study Tasks</span></button>
+              <button onClick={() => scrollToSection('challenges-section')} className={styles['nav-button']}><Target size={16} /><span>Challenges</span></button>
+              <button onClick={() => scrollToSection('news-section')} className={styles['nav-button']}><Leaf size={16} /><span>News</span></button>
             </div>
 
-            {/* Desktop Right Side */}
             <div className={styles['desktop-right']}>
-              <button className={styles['notification-btn']}>
-                <Bell size={20} />
-                <span className={styles['notification-badge']}>3</span>
-              </button>
-              <div className={styles['profile-section']}>
-                <div className={styles['profile-avatar']}>AJ</div>
-                <span>{studentData.name}</span>
-              </div>
+              <button className={styles['notification-btn']}><Bell size={20} /><span className={styles['notification-badge']}>3</span></button>
+              <Link to="/profile" className={styles['profile-link']}>
+                <div className={styles['profile-section']}>
+                  <div className={styles['profile-avatar']}>{studentData.name.charAt(0).toUpperCase()}</div>
+                  <span>{studentData.name}</span>
+                </div>
+              </Link>
             </div>
-
-            {/* Mobile Menu Button */}
+            
             <button onClick={toggleMobileMenu} className={styles['mobile-menu-btn']}>
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
-          {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className={styles['mobile-menu']}>
-              <button onClick={() => scrollToSection('dashboard-top')} className={`${styles['nav-button']} ${styles.active}`}>
-                <Home size={16} /><span>Dashboard</span>
-              </button>
-              <button onClick={() => scrollToSection('study-section')} className={styles['nav-button']}>
-                <BookOpen size={16} /><span>Study Tasks</span>
-              </button>
-              <button onClick={() => scrollToSection('challenges-section')} className={styles['nav-button']}>
-                <Target size={16} /><span>Challenges</span>
-              </button>
-              <button onClick={() => scrollToSection('news-section')} className={styles['nav-button']}>
-                <Leaf size={16} /><span>News</span>
-              </button>
+              <button onClick={() => scrollToSection('dashboard-top')} className={`${styles['nav-button']} ${styles.active}`}><Home size={16} /><span>Dashboard</span></button>
+              <button onClick={() => scrollToSection('study-section')} className={styles['nav-button']}><BookOpen size={16} /><span>Study Tasks</span></button>
+              <button onClick={() => scrollToSection('challenges-section')} className={styles['nav-button']}><Target size={16} /><span>Challenges</span></button>
+              <button onClick={() => scrollToSection('news-section')} className={styles['nav-button']}><Leaf size={16} /><span>News</span></button>
               <div className={styles['mobile-nav-section']}>
-                <div className={styles['mobile-profile']}>
-                  <div className={styles['profile-avatar']}>AJ</div>
-                  <span>{studentData.name}</span>
-                </div>
-                <button className={styles['mobile-notification']}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Bell size={16} /><span>Notifications</span>
+                <Link to="/profile" className={styles['profile-link']} onClick={toggleMobileMenu}>
+                  <div className={styles['profile-section']}>
+                    <div className={styles['profile-avatar']}>{studentData.name.charAt(0).toUpperCase()}</div>
+                    <span>{studentData.name}</span>
                   </div>
+                </Link>
+                <button className={styles['mobile-notification']}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Bell size={16} /><span>Notifications</span></div>
                   <span className={styles['notification-badge']}>3</span>
                 </button>
               </div>
@@ -156,29 +143,17 @@ const StudentDashboard = () => {
         </div>
       </nav>
 
-      {/* Header */}
       <header id="dashboard-top" className={styles.header}>
         <div className={styles['header-container']}>
           <div className={styles['header-content']}>
             <div className={styles['welcome-section']}>
-              <h1>
-                Welcome back, <span className={styles['welcome-name']}>{studentData.name}</span>! 🌱
-              </h1>
+              <h1>Welcome back, <span className={styles['welcome-name']}>{studentData.name}</span>! 🌱</h1>
               <p className={styles['welcome-subtitle']}>Ready to make a difference today?</p>
-            </div>
-            <div className={styles['level-progress']}>
-              <div className={styles['level-info']}>
-                <span className={styles['level-text']}>Eco Level {studentData.level}</span>
-                <span className={styles['xp-text']}>{studentData.currentXP}/{studentData.nextLevelXP} XP</span>
-              </div>
-              <div className={styles['progress-bar']}>
-                <div className={styles['progress-fill']} style={{ width: `${progressPercentage}%` }}></div>
-              </div>
             </div>
           </div>
         </div>
       </header>
-
+      
       <main className={styles['main-content']}>
         {/* Top Row - Points and Badges */}
         <div className={styles['grid-3']}>
@@ -207,6 +182,27 @@ const StudentDashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Quick Actions Section */}
+        <div className={`${styles.card} ${styles['grid-1']}`}>
+          <h3 className={styles['section-title']}>Quick Actions</h3>
+          <div className={styles['actions-grid']}>
+            <Link to="/student/quiz" className={styles['action-btn']}>
+              <BookOpen size={20} />
+              <span>Take a Quiz</span>
+            </Link>
+            <button className={`${styles['action-btn']} ${styles.green}`}>
+              <Target size={20} />
+              <span>Complete Challenge</span>
+            </button>
+            <button className={`${styles['action-btn']} ${styles.purple}`}>
+              <Users size={20} />
+              <span>View Leaderboard</span>
+            </button>
+          </div>
+        </div>
+
+
 
         {/* Quick Actions */}
         <div className={`${styles.card} ${styles['grid-1']}`}>

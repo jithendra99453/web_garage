@@ -12,46 +12,57 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // @route   GET /api/quiz/generate
 // @desc    Generate a new set of quiz questions using Gemini
-router.get('/generate', async (req, res) => {
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+// ... imports and setup remain the same ...
 
+router.get('/generate', async (req, res) => {
+  let rawText = ''; // Define rawText here to access it in the catch block
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `
-      Generate a list of 10 multiple-choice quiz questions about environmental science and sustainability for students. The questions should be unique, engaging, and of varying difficulty. Provide the output ONLY in a valid JSON array format. Do not include any other text, comments, or markdown formatting. Each object in the array must have this exact structure:
-    {
-    "question": "The question text.",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correctAnswer": (a zero-based index, e.g., 0 for Option A),
-    "explanation": "A brief and interesting explanation for the correct answer."
-    }
+      Generate a list of 10 multiple-choice quiz questions about environmental science and sustainability.
+      Provide the output ONLY in a valid JSON array format.
+      Each object in the array MUST have this exact structure, with these exact property names:
+      {
+        "question": "The question text.",
+        "options": ["Option A", "Option B", "Option C", "Option D"],
+        "correctAnswer": (a zero-based index of the correct answer, e.g., 0, 1, 2, or 3),
+        "explanation": "A brief and interesting explanation or tip for why the answer is correct."
+      }
     `;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = await response.text();
+    rawText = await response.text();
 
-    // The model should return clean JSON, but we'll trim just in case.
-    const cleanedText = text.trim();
+    console.log("--- Raw Gemini Response ---");
+    console.log(rawText);
 
-    // Validate that the response is parseable JSON
-    let questions;
-    try {
-        questions = JSON.parse(cleanedText);
-    } catch (parseError) {
-        console.error('Failed to parse JSON from Gemini response:', parseError);
-        console.error('--- Raw Gemini Response ---');
-        console.error(text); // Log the raw text to see what Gemini sent
-        console.error('---------------------------');
-        // Throw a specific error if parsing fails
-        throw new Error('The AI model returned a response that was not valid JSON.');
+    // --- AGGRESSIVE JSON EXTRACTION ---
+
+    // 1. Find the first occurrence of '['
+    const startIndex = rawText.indexOf('[');
+    
+    // 2. Find the last occurrence of ']'
+    const endIndex = rawText.lastIndexOf(']');
+
+    // 3. Check if we found a valid start and end
+    if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+      throw new Error("Could not find a valid JSON array (starting with '[' and ending with ']') in the response.");
     }
 
+    // 4. Extract the substring that is likely our JSON
+    const jsonString = rawText.substring(startIndex, endIndex + 1);
+
+    // 5. Parse the extracted string
+    const questions = JSON.parse(jsonString);
+    
     res.status(200).json(questions);
 
   } catch (error) {
-    // Log the specific error message for better debugging
     console.error('Error generating quiz questions:', error.message);
-    res.status(500).json({ message: 'Failed to generate quiz questions.' });
+    console.error('--- Failed Raw Text ---');
+    console.error(rawText); // This will show us the exact text that caused the failure
+    res.status(500).json({ message: 'Failed to generate and parse quiz questions.' });
   }
 });
 
