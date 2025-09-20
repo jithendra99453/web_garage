@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
+import { UserProvider } from './context/UserContext.jsx'; 
 // Import your components
 import ProfilePage from './components/Profile/Profile.jsx'; // 1. Import the new Profile component
 import LandingPage from './components/LandingPage/LandingPage.jsx';
@@ -40,6 +41,7 @@ import EcoSustainableLiving from './components/EcoSustainableLiving/EcoSustainab
 
 function App() {
   return (
+    <UserProvider>
     <Routes>
       {/* --- Public Routes --- */}
       <Route path="/" element={<LandingPage />} />
@@ -83,6 +85,7 @@ function App() {
         {/* <Route path="/school-dashboard" element={<SchoolDashboard />} /> */}
       </Route>
     </Routes>
+    </UserProvider>
   );
 }
 

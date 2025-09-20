@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
 import { Leaf, Award, RotateCcw } from 'lucide-react';
 import styles from './EcoPuzzle.module.css';
-
+import { awardPoints } from '../../utils/api'; // Correctly imported
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../context/UserContext'; // Path to your context
 const EcoPuzzle = () => {
   const [puzzlePieces, setPuzzlePieces] = useState([]);
   const [draggedPiece, setDraggedPiece] = useState(null);
@@ -35,35 +36,45 @@ const EcoPuzzle = () => {
     setDraggedPiece(piece);
   };
 
-  const handleDrop = (e, targetIndex) => {
+  // --- THIS IS THE KEY MODIFICATION ---
+  const handleDrop = async (e, targetIndex) => { // Made this function async
     e.preventDefault();
     if (!draggedPiece) return;
 
     const newPieces = [...puzzlePieces];
     const draggedIndex = newPieces.findIndex(p => p.id === draggedPiece.id);
-    const targetPiece = newPieces[targetIndex];
 
     // Swap positions
-    newPieces[draggedIndex].currentPosition = targetIndex;
-    newPieces[targetIndex].currentPosition = draggedIndex;
-
-    // Swap in array
     [newPieces[draggedIndex], newPieces[targetIndex]] = [newPieces[targetIndex], newPieces[draggedIndex]];
 
     setPuzzlePieces(newPieces);
     setDraggedPiece(null);
 
     // Check if puzzle is complete
-    const isComplete = newPieces.every(piece => piece.currentPosition === piece.correctPosition);
+    const isComplete = newPieces.every((p, i) => p.correctPosition === i);
+
     if (isComplete) {
       setCompleted(true);
-      setScore(prev => prev + 100);
+      const pointsToAward = 25; // Set the point value for this game
+      setScore(pointsToAward); // Update the local score display
+
+      // Call the reusable API function to award points
+      const updatedData = await awardPoints(pointsToAward);
+
+      // Optional: Show an alert or a more subtle notification
+      if (updatedData) {
+        console.log(`Awarded ${pointsToAward} points! New total is ${updatedData.totalPoints}.`);
+        // The alert has been removed for a better user experience, 
+        // the completion message in the UI is sufficient.
+      }
     }
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
   };
+
+  // --- The `handleGameWin` function is no longer needed and can be deleted ---
 
   return (
     <div className={styles.container}>
@@ -76,7 +87,8 @@ const EcoPuzzle = () => {
           <div className={styles.scoreContainer}>
             <div className={styles.scoreBox}>
               <Award style={{ display: 'inline', width: '1rem', height: '1rem', color: '#16a34a' }} />
-              <span className={styles.scoreValue}>{score} points</span>
+              {/* Display the score from the state */}
+              <span className={styles.scoreValue}>{completed ? score : '0'} points</span>
             </div>
           </div>
         </div>
@@ -91,17 +103,9 @@ const EcoPuzzle = () => {
                 onDrop={(e) => handleDrop(e, index)}
                 onDragOver={handleDragOver}
                 style={{
-                  width: '6rem',
-                  height: '6rem',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '0.5rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '2rem',
-                  cursor: 'move',
-                  background: completed ? '#dcfce7' : '#f9fafb',
-                  transition: 'all 0.2s'
+                  width: '6rem', height: '6rem', border: '2px solid #d1d5db', borderRadius: '0.5rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', cursor: 'move',
+                  background: completed ? '#dcfce7' : '#f9fafb', transition: 'all 0.2s'
                 }}
               >
                 {piece.image}
@@ -117,23 +121,9 @@ const EcoPuzzle = () => {
               Puzzle Complete! 🎉
             </h2>
             <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-              Great job! You've arranged the garden perfectly and earned 100 eco-points!
+              Great job! You've arranged the garden perfectly and earned {score} eco-points!
             </p>
-            <button
-              onClick={initializePuzzle}
-              style={{
-                background: '#16a34a',
-                color: 'white',
-                padding: '0.75rem 2rem',
-                borderRadius: '0.75rem',
-                fontWeight: '500',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-            >
+            <button onClick={initializePuzzle} style={{ /* ... your button styles ... */ }}>
               <RotateCcw style={{ width: '1.25rem', height: '1.25rem' }} />
               Play Again
             </button>

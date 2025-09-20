@@ -42,4 +42,38 @@ router.put('/', auth, async (req, res) => {
   }
 });
 
+
+
+// --- ADD THIS NEW ROUTE ---
+// @route   PATCH /api/profile/points
+// @desc    Add points to a user's total
+router.patch('/points', auth, async (req, res) => {
+  const { points } = req.body;
+
+  // Basic validation
+  if (typeof points !== 'number' || points <= 0) {
+    return res.status(400).json({ msg: 'Invalid points value.' });
+  }
+
+  try {
+    // Use MongoDB's $inc operator to atomically increment the points
+    const student = await Student.findByIdAndUpdate(
+      req.user.id,
+      { $inc: { totalPoints: points } },
+      { new: true } // This option returns the updated document
+    ).select('totalPoints');
+
+    if (!student) {
+      return res.status(404).json({ msg: 'User not found.' });
+    }
+
+    // Send back the new total
+    res.json({ totalPoints: student.totalPoints });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;

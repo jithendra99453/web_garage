@@ -22,7 +22,6 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/quiz', quizRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api', authRoutes);
-
 // --- Start the Server ---
 app.listen(PORT, () => {
   console.log(`Backend server is running on http://localhost:${PORT}`);

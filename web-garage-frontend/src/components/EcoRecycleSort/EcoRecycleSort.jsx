@@ -1,55 +1,83 @@
-import React, { useState, useEffect } from 'react';
+// 1. Import 'useContext' from React
+import React, { useState, useEffect, useContext } from 'react';
 import { Recycle, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
 import styles from './EcoRecycleSort.module.css';
+import { awardPoints } from '../../utils/api'; 
+import UserContext from '../../context/UserContext';
+
+// 2. Move constant data arrays OUTSIDE the component function
+const recyclableItems = [
+  { name: "Plastic Bottle", category: "plastic", image: "🍼" },
+  { name: "Glass Jar", category: "glass", image: "🍯" },
+  { name: "Paper Bag", category: "paper", image: "🛍️" },
+  { name: "Aluminum Can", category: "metal", image: "🥤" },
+  { name: "Cardboard Box", category: "paper", image: "📦" },
+  { name: "Plastic Bag", category: "plastic", image: "🛒" },
+  { name: "Newspaper", category: "paper", image: "📰" },
+  { name: "Wine Bottle", category: "glass", image: "🍷" },
+  { name: "Tin Can", category: "metal", image: "🥫" },
+  { name: "Magazine", category: "paper", image: "📖" }
+];
+
+const nonRecyclableItems = [
+  { name: "Pizza Box", category: "trash", image: "🍕" },
+  { name: "Plastic Wrap", category: "trash", image: "🎁" },
+  { name: "Styrofoam Cup", category: "trash", image: "☕" },
+  { name: "Tissue Paper", category: "trash", image: "🧻" },
+  { name: "Ceramic Plate", category: "trash", image: "🍽️" }
+];
+
+const bins = {
+  plastic: { name: "Plastic", color: "blue", icon: "🔵" },
+  glass: { name: "Glass", color: "green", icon: "🟢" },
+  paper: { name: "Paper", color: "yellow", icon: "🟡" },
+  metal: { name: "Metal", color: "red", icon: "🔴" },
+  trash: { name: "Trash", color: "black", icon: "⚫" }
+};
 
 const EcoRecycleSort = () => {
+  // 3. Get the refresh function from the context
+  const { refreshStudentData } = useContext(UserContext);
+  
   const [items, setItems] = useState([]);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameOver, setGameOver] = useState(false);
   const [currentItem, setCurrentItem] = useState(0);
 
-  const recyclableItems = [
-    { name: "Plastic Bottle", category: "plastic", image: "🍼" },
-    { name: "Glass Jar", category: "glass", image: "🍯" },
-    { name: "Paper Bag", category: "paper", image: "🛍️" },
-    { name: "Aluminum Can", category: "metal", image: "🥤" },
-    { name: "Cardboard Box", category: "paper", image: "📦" },
-    { name: "Plastic Bag", category: "plastic", image: "🛒" },
-    { name: "Newspaper", category: "paper", image: "📰" },
-    { name: "Wine Bottle", category: "glass", image: "🍷" },
-    { name: "Tin Can", category: "metal", image: "🥫" },
-    { name: "Magazine", category: "paper", image: "📖" }
-  ];
-
-  const nonRecyclableItems = [
-    { name: "Pizza Box", category: "trash", image: "🍕" },
-    { name: "Plastic Wrap", category: "trash", image: "🎁" },
-    { name: "Styrofoam Cup", category: "trash", image: "☕" },
-    { name: "Tissue Paper", category: "trash", image: "🧻" },
-    { name: "Ceramic Plate", category: "trash", image: "🍽️" }
-  ];
-
-  const bins = {
-    plastic: { name: "Plastic", color: "blue", icon: "🔵" },
-    glass: { name: "Glass", color: "green", icon: "🟢" },
-    paper: { name: "Paper", color: "yellow", icon: "🟡" },
-    metal: { name: "Metal", color: "red", icon: "🔴" },
-    trash: { name: "Trash", color: "black", icon: "⚫" }
-  };
-
+  // Initialize game on first load
   useEffect(() => {
     initializeGame();
   }, []);
 
+  // Timer logic
   useEffect(() => {
     if (timeLeft > 0 && !gameOver) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && !gameOver) {
       setGameOver(true);
     }
   }, [timeLeft, gameOver]);
+
+  // 4. Use a SINGLE useEffect to handle game completion
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      // Check if the game is over and the user has scored points
+      if (gameOver && score > 0) {
+        console.log(`Game over! Final score: ${score}. Awarding points...`);
+        // First, award the points to the backend
+        await awardPoints(score);
+        
+        // Then, trigger the global refresh to update the dashboard
+        console.log("Refreshing student data...");
+        refreshStudentData(); 
+      }
+    };
+    
+    saveFinalScore();
+    // This effect runs when `gameOver` changes, ensuring points are saved and data is refreshed
+  }, [gameOver, score, refreshStudentData]);
 
   const initializeGame = () => {
     const gameItems = [...recyclableItems, ...nonRecyclableItems]
@@ -92,7 +120,6 @@ const EcoRecycleSort = () => {
         <div className={styles.header}>
           <h1 className={styles.title}>♻️ Eco Recycle Sort</h1>
           <p className={styles.subtitle}>Sort items into the correct recycling bins!</p>
-
           <div className={styles.scoreTimeContainer}>
             <div className={styles.scoreBox}>
               <span className={styles.scoreValue}>{score}</span>
@@ -147,11 +174,11 @@ const EcoRecycleSort = () => {
             <div className={styles.tipsBox}>
               <h3 className={styles.tipsTitle}>💡 Recycling Tips:</h3>
               <ul className={styles.tipsList}>
-                <li>• Clean items before recycling</li>
-                <li>• Remove caps and lids from bottles</li>
-                <li>• Flatten cardboard boxes</li>
-                <li>• Check local recycling guidelines</li>
-                <li>• Avoid wishcycling (guessing what can be recycled)</li>
+                <li>Clean items before recycling</li>
+                <li>Remove caps and lids from bottles</li>
+                <li>Flatten cardboard boxes</li>
+                <li>Check local recycling guidelines</li>
+                <li>Avoid wishcycling (guessing what can be recycled)</li>
               </ul>
             </div>
 

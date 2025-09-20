@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react'; 
 import { Clock, Leaf, Award, ChevronRight, RotateCcw } from 'lucide-react';
 import axios from 'axios';
+import UserContext from '../../context/UserContext'; // Adjust path if needed
+import { awardPoints } from '../../utils/api';  
+
 
 const EcoQuiz = () => {
+  const { refreshStudentData } = useContext(UserContext);
   // Quiz state management
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -16,6 +20,27 @@ const EcoQuiz = () => {
   const [userLevel, setUserLevel] = useState(1);
   const [hasLeveledUp, setHasLeveledUp] = useState(false);
 
+
+
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      // Only run if the quiz is complete and the user scored points
+      if (isQuizComplete && ecoPoints > 0) {
+        console.log(`Quiz complete! Awarding ${ecoPoints} eco points.`);
+        // 1. Send the final score to the backend
+        await awardPoints(ecoPoints);
+
+        // 2. Refresh the global student data to update the dashboard
+        console.log("Refreshing student data to show new total points...");
+        refreshStudentData();
+      }
+    };
+
+    saveFinalScore();
+    // This effect depends on isQuizComplete, ecoPoints, and the refresh function
+  }, [isQuizComplete, ecoPoints, refreshStudentData]);
+
+  
   // Styles object
   const styles = {
     container: {
