@@ -9,12 +9,36 @@ import styles from './StudentDashboard.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+// --- CORRECT PLACEMENT: Define constants outside the component ---
+const allGames = [
+  { name: 'Eco Puzzle', link: '/student/puzzle', icon: <Puzzle size={20} />, level: 'School', color: 'blue' },
+  { name: 'Memory Game', link: '/student/memory', icon: <Brain size={20} />, level: 'School', color: 'green' },
+  { name: 'Word Search', link: '/student/wordsearch', icon: <Search size={20} />, level: 'School', color: 'blue' },
+  { name: 'Matching Game', link: '/student/matching', icon: <Puzzle size={20} />, level: 'School', color: 'yellow' },
+  { name: 'Sorting Game', link: '/student/sorting', icon: <Trash2 size={20} />, level: 'School', color: 'red' },
+  { name: 'Eco Bingo', link: '/student/bingo', icon: <Trophy size={20} />, level: 'School', color: 'emerald' },
+  { name: 'Wildlife Match', link: '/student/wildlife', icon: <Award size={20} />, level: 'School', color: 'violet' },
+  { name: 'Garden Planner', link: '/student/garden', icon: <Home size={20} />, level: 'School', color: 'rose' },
+  { name: 'Pollution Puzzle', link: '/student/pollution', icon: <Settings size={20} />, level: 'School', color: 'stone' },
+  { name: 'Solar Simulator', link: '/student/solar', icon: <Sun size={20} />, level: 'School', color: 'neutral' },
+  { name: 'Recycle Sort', link: '/student/recycle', icon: <Recycle size={20} />, level: 'School', color: 'cyan' },
+  { name: 'Water Saver', link: '/student/water', icon: <Users size={20} />, level: 'School', color: 'sky' },
+  { name: 'Eco Trivia', link: '/student/trivia', icon: <HelpCircle size={20} />, level: 'College', color: 'purple' },
+  { name: 'Carbon Calculator', link: '/student/carbon', icon: <TrendingDown size={20} />, level: 'College', color: 'teal' },
+  { name: 'Energy Quiz', link: '/student/energy', icon: <Zap size={20} />, level: 'College', color: 'indigo' },
+  { name: 'Climate Challenge', link: '/student/climate', icon: <Leaf size={20} />, level: 'College', color: 'fuchsia' },
+  { name: 'Waste Audit', link: '/student/waste', icon: <Trash2 size={20} />, level: 'College', color: 'amber' },
+  { name: 'Sustainability Trivia', link: '/student/sustainability', icon: <BookOpen size={20} />, level: 'College', color: 'lime' },
+  { name: 'Food Waste Game', link: '/student/foodwaste', icon: <Target size={20} />, level: 'College', color: 'orange' },
+];
+
 const StudentDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [studyTaskCompleted, setStudyTaskCompleted] = useState(false);
   const [studentData, setStudentData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const [availableGames, setAvailableGames] = useState([]);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -28,17 +52,23 @@ const StudentDashboard = () => {
       try {
         const res = await axios.get('http://localhost:5000/api/profile');
         
-        // Ensure default values for gamification fields to prevent crashes
         const completeStudentData = {
-          totalPoints: 0,
-          currentXP: 0,
-          nextLevelXP: 100,
-          co2Saved: 0,
-          plasticReduced: 0,
-          level: 1,
-          ...res.data
+          totalPoints: 0, currentXP: 0, nextLevelXP: 100, co2Saved: 0, plasticReduced: 0, level: 1, ...res.data
         };
         setStudentData(completeStudentData);
+
+        // --- THE FIX: Better filtering logic ---
+        const userEducationLevel = completeStudentData.educationType?.toLowerCase();
+        let filteredGames = [];
+
+        if (userEducationLevel === 'school') {
+          filteredGames = allGames.filter(game => game.level === 'School');
+        } else {
+          // Default to College games for 'College', 'UG', 'Other', etc.
+          filteredGames = allGames.filter(game => game.level === 'College');
+        }
+        
+        setAvailableGames(filteredGames);
 
       } catch (err) {
         console.error('Failed to fetch user data', err);
@@ -52,6 +82,7 @@ const StudentDashboard = () => {
     fetchStudentData();
   }, [navigate]);
 
+
   const badges = [
     { id: 1, name: "Recycling Hero", icon: "🏆", color: "badge-yellow" },
     { id: 2, name: "Water Saver", icon: "💧", color: "badge-blue" },
@@ -60,7 +91,7 @@ const StudentDashboard = () => {
   ];
 
   const upcomingTasks = [
-    { id: 1, title: "Segregate Waste Challenge", description: "Sort your household waste correctly for one week", deadline: "Due: Today, 19 Sep 2025", points: 150 },
+    { id: 1, title: "Segregate Waste Challenge", description: "Sort your household waste correctly for one week", deadline: "Due: Today, 20 Sep 2025", points: 150 },
   ];
 
   const newsItems = [
@@ -155,7 +186,6 @@ const StudentDashboard = () => {
       </header>
       
       <main className={styles['main-content']}>
-        {/* Top Row - Points and Badges */}
         <div className={styles['grid-3']}>
           <div className={`${styles.card} ${styles['card-border-yellow']}`}>
             <div className={styles['points-card']}>
@@ -183,7 +213,6 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions Section */}
         <div className={`${styles.card} ${styles['grid-1']}`}>
           <h3 className={styles['section-title']}>Quick Actions</h3>
           <div className={styles['actions-grid']}>
@@ -202,71 +231,20 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-
-
-        {/* Quick Actions */}
         <div className={`${styles.card} ${styles['grid-1']}`}>
           <h3 className={styles['section-title']}>Eco Games</h3>
           <div className={styles['actions-grid']}>
-            <Link to='/student/puzzle' className={styles['action-btn']}>
-               <Puzzle size={20} /><span>Eco Puzzle</span>
-            </Link>
-            <Link to='/student/memory' className={`${styles['action-btn']} ${styles.green}`}>
-              <Brain size={20} /><span>Memory Game</span>
-            </Link>
-            <Link to='/student/trivia' className={`${styles['action-btn']} ${styles.purple}`}>
-              <HelpCircle size={20} /><span>Eco Trivia</span>
-            </Link>
-            <Link to='/student/wordsearch' className={`${styles['action-btn']} ${styles.blue}`}>
-              <Search size={20} /><span>Word Search</span>
-            </Link>
-            <Link to='/student/matching' className={`${styles['action-btn']} ${styles.yellow}`}>
-              <Puzzle size={20} /><span>Matching Game</span>
-            </Link>
-            <Link to='/student/sorting' className={`${styles['action-btn']} ${styles.red}`}>
-              <Trash2 size={20} /><span>Sorting Game</span>
-            </Link>
-            <Link to='/student/bingo' className={`${styles['action-btn']} ${styles.emerald}`}>
-              <Trophy size={20} /><span>Eco Bingo</span>
-            </Link>
-            <Link to='/student/carbon' className={`${styles['action-btn']} ${styles.teal}`}>
-              <TrendingDown size={20} /><span>Carbon Calculator</span>
-            </Link>
-            <Link to='/student/recycle' className={`${styles['action-btn']} ${styles.cyan}`}>
-              <Recycle size={20} /><span>Recycle Sort</span>
-            </Link>
-            <Link to='/student/water' className={`${styles['action-btn']} ${styles.sky}`}>
-              <Users size={20} /><span>Water Saver</span>
-            </Link>
-            <Link to='/student/energy' className={`${styles['action-btn']} ${styles.indigo}`}>
-              <Zap size={20} /><span>Energy Quiz</span>
-            </Link>
-            <Link to='/student/wildlife' className={`${styles['action-btn']} ${styles.violet}`}>
-              <Award size={20} /><span>Wildlife Match</span>
-            </Link>
-            <Link to='/student/climate' className={`${styles['action-btn']} ${styles.fuchsia}`}>
-              <Leaf size={20} /><span>Climate Challenge</span>
-            </Link>
-            <Link to='/student/garden' className={`${styles['action-btn']} ${styles.rose}`}>
-              <Home size={20} /><span>Garden Planner</span>
-            </Link>
-            <Link to='/student/waste' className={`${styles['action-btn']} ${styles.amber}`}>
-              <Trash2 size={20} /><span>Waste Audit</span>
-            </Link>
-            <Link to='/student/sustainability' className={`${styles['action-btn']} ${styles.lime}`}>
-              <BookOpen size={20} /><span>Sustainability Trivia</span>
-            </Link>
-            <Link to='/student/foodwaste' className={`${styles['action-btn']} ${styles.orange}`}>
-              <Target size={20} /><span>Food Waste Game</span>
-            </Link>
-            <Link to='/student/pollution' className={`${styles['action-btn']} ${styles.stone}`}>
-              <Settings size={20} /><span>Pollution Puzzle</span>
-            </Link>
-            <Link to='/student/solar' className={`${styles['action-btn']} ${styles.neutral}`}>
-              <Sun size={20} /><span>Solar Simulator</span>
-            </Link>
+            {availableGames.map((game) => (
+              <Link to={game.link} key={game.name} className={`${styles['action-btn']} ${styles[game.color]}`}>
+                {game.icon}
+                <span>{game.name}</span>
+              </Link>
+            ))}
           </div>
         </div>
+
+       
+
 
         {/* Study Task Section */}
         <div id="study-section" className={`${styles.card} ${styles['grid-1']}`}>

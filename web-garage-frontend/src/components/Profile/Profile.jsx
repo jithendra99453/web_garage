@@ -27,15 +27,30 @@ const Profile = () => {
     editButton: { background: 'linear-gradient(135deg, #4caf50, #66bb6a)', color: 'white', boxShadow: '0 4px 16px rgba(76, 175, 80, 0.3)' },
     saveButton: { background: 'linear-gradient(135deg, #2e7d32, #4caf50)', color: 'white', boxShadow: '0 4px 16px rgba(76, 175, 80, 0.3)' },
     cancelButton: { background: 'linear-gradient(135deg, #757575, #9e9e9e)', color: 'white', boxShadow: '0 4px 16px rgba(117, 117, 117, 0.3)' },
-    buttonHover: { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(76, 175, 80, 0.4)' }
+    buttonHover: { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(76, 175, 80, 0.4)' },
+    // NECESSARY CHANGE: Style for centering the spinner
+    spinnerContainer: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }
   };
-  const mediaQueries = `
+  
+  // NECESSARY CHANGE: Add spinner animation and styles within a style tag
+  const componentStyles = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spinner {
+      border: 5px solid #e8f5e8; /* Light green */
+      border-top: 5px solid #4caf50; /* Dark green */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
     @media (max-width: 768px) {
       /* Your responsive styles */
     }
   `;
 
-  // NECESSARY CHANGES: Initialize state to null and add loading state
   const [profileData, setProfileData] = useState(null);
   const [editData, setEditData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -43,9 +58,8 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   const fileInputRef = useRef(null);
-  const categories = ['School', 'College', 'Other'];
+  const categories = ['School', 'College','UG','PG'];
 
-  // NECESSARY CHANGE: Fetch profile data when the component loads
   useEffect(() => {
     const fetchProfileData = async () => {
       const token = localStorage.getItem('token');
@@ -55,7 +69,7 @@ const Profile = () => {
           const res = await axios.get('http://localhost:5000/api/profile');
           const userData = {
             ...res.data,
-            category: res.data.educationType // Align backend `educationType` with frontend `category`
+            category: res.data.educationType
           };
           setProfileData(userData);
           setEditData(userData);
@@ -73,14 +87,10 @@ const Profile = () => {
     setIsEditing(true);
   };
 
-  // NECESSARY CHANGE: Implement save functionality to call the API
   const handleSave = async () => {
     try {
-      // Prepare data for the backend, aligning 'category' with 'educationType'
       const dataToSave = { ...editData, educationType: editData.category };
-      
       const res = await axios.put('http://localhost:5000/api/profile', dataToSave);
-
       const updatedData = { ...res.data, category: res.data.educationType };
       setProfileData(updatedData);
       setEditData(updatedData);
@@ -117,22 +127,26 @@ const Profile = () => {
     fileInputRef.current?.click();
   };
 
-  // NECESSARY CHANGE: Handle the loading state
+  // NECESSARY CHANGE: Display spinner while loading
   if (isLoading || !profileData) {
-    return <div>Loading Profile...</div>;
+    return (
+      <div style={styles.spinnerContainer}>
+        <div className="spinner"></div>
+      </div>
+    );
   }
   
   const currentData = isEditing ? editData : profileData;
 
   return (
     <>
-      <style>{mediaQueries}</style>
+      {/* NECESSARY CHANGE: Inject the styles into the document head */}
+      <style>{componentStyles}</style>
       <div style={styles.profileContainer} className="profileContainer">
         <div style={styles.profileCard}>
           <div style={styles.header}>
             <h1 style={styles.title}>Student Profile</h1>
           </div>
-          {/* Profile Image Section */}
           <div style={styles.profileImageSection}>
             <div style={styles.imageContainer}>
               {currentData.profilePicture ? (
@@ -150,7 +164,6 @@ const Profile = () => {
               )}
             </div>
           </div>
-          {/* Profile Information */}
           <div style={styles.formGrid}>
             <div style={styles.fieldGroup}>
               <label style={styles.label}>Full Name</label>
@@ -162,7 +175,6 @@ const Profile = () => {
             </div>
             <div style={styles.fieldGroup}>
               <label style={styles.label}>Email Address</label>
-              {/* Email is not editable */}
               <div style={styles.displayValue}>{currentData.email}</div>
             </div>
             <div style={styles.fieldGroup}>
@@ -184,7 +196,6 @@ const Profile = () => {
               )}
             </div>
           </div>
-          {/* Action Buttons */}
           <div style={styles.buttonGroup}>
             {isEditing ? (
               <>
