@@ -1,7 +1,17 @@
-import React, { useState } from 'react';
-import { Trash2, Recycle, Plus, Minus } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import styles from './EcoWasteAudit.module.css';
+import { Trash2, Recycle, Plus, Minus, RotateCcw, BarChart3 } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoWasteAudit = () => {
+  // 1. CONNECT to the context
+  const { refreshStudentData } = useContext(UserContext);
+  
+  // 2. MANAGE game state
+  const [score, setScore] = useState(0);
+  const [auditComplete, setAuditComplete] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
   const [wasteItems, setWasteItems] = useState([
     { category: 'Plastic', amount: 0, unit: 'kg', recyclable: true },
     { category: 'Paper', amount: 0, unit: 'kg', recyclable: true },
@@ -11,8 +21,16 @@ const EcoWasteAudit = () => {
     { category: 'Other', amount: 0, unit: 'kg', recyclable: false }
   ]);
 
-  const [auditComplete, setAuditComplete] = useState(false);
-  const [recommendations, setRecommendations] = useState([]);
+  // 3. SAVE score when the audit is complete
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (auditComplete && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [auditComplete, score, refreshStudentData]);
 
   const updateAmount = (index, change) => {
     const newItems = [...wasteItems];
@@ -61,6 +79,9 @@ const EcoWasteAudit = () => {
     const stats = calculateTotals();
     const recs = generateRecommendations(stats);
     setRecommendations(recs);
+    // Award 10 points per 1kg recycled, minimum 10 points for completing
+    const points = Math.max(10, Math.round(stats.recyclableWaste * 10));
+    setScore(points);
     setAuditComplete(true);
   };
 
@@ -68,150 +89,148 @@ const EcoWasteAudit = () => {
     setWasteItems(wasteItems.map(item => ({ ...item, amount: 0 })));
     setAuditComplete(false);
     setRecommendations([]);
+    setScore(0);
   };
 
   const stats = calculateTotals();
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">📊 Eco Waste Audit</h1>
-          <p className="text-lg text-gray-600">Track and analyze your household waste to improve recycling habits!</p>
-        </div>
-
-        {!auditComplete ? (
-          <div className="bg-white rounded-xl shadow-2xl p-8">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Weekly Waste Tracking</h2>
-              <p className="text-gray-600 mb-6">
-                Estimate how much waste you generate in each category per week:
-              </p>
+  if (auditComplete) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.resultContainer}>
+          <div className={styles.resultHeader}>
+            <div className={styles.resultIcon}>
+              <BarChart3 size={48} />
             </div>
+            <h2 className={styles.resultTitle}>Waste Audit Complete!</h2>
+            <div className={styles.pointsEarned}>You earned {score} eco points!</div>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {wasteItems.map((item, index) => (
-                <div key={item.category} className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      {item.recyclable ? (
-                        <Recycle className="text-green-500" size={20} />
-                      ) : (
-                        <Trash2 className="text-gray-500" size={20} />
-                      )}
-                      <span className="font-medium text-gray-800">{item.category}</span>
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      item.recyclable
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {item.recyclable ? 'Recyclable' : 'Non-recyclable'}
-                    </span>
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{stats.totalWaste.toFixed(1)}</div>
+              <div className={styles.statLabel}>Total Waste (kg)</div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{stats.recyclableWaste.toFixed(1)}</div>
+              <div className={styles.statLabel}>Recyclable (kg)</div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{stats.nonRecyclableWaste.toFixed(1)}</div>
+              <div className={styles.statLabel}>Non-recyclable (kg)</div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{stats.recyclingRate.toFixed(1)}%</div>
+              <div className={styles.statLabel}>Recycling Rate</div>
+            </div>
+          </div>
+
+          <div className={styles.breakdown}>
+            <h3 className={styles.breakdownTitle}>Waste Breakdown</h3>
+            <div className={styles.breakdownList}>
+              {wasteItems.map((item) => (
+                <div key={item.category} className={styles.breakdownItem}>
+                  <div className={styles.breakdownLeft}>
+                    {item.recyclable ? (
+                      <Recycle className={styles.recycleIcon} size={16} />
+                    ) : (
+                      <Trash2 className={styles.trashIcon} size={16} />
+                    )}
+                    <span className={styles.breakdownCategory}>{item.category}</span>
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() => updateAmount(index, -0.5)}
-                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded"
-                    >
-                      <Minus size={16} />
-                    </button>
-
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">{item.amount}</div>
-                      <div className="text-sm text-gray-600">{item.unit}</div>
-                    </div>
-
-                    <button
-                      onClick={() => updateAmount(index, 0.5)}
-                      className="bg-green-500 hover:bg-green-600 text-white p-2 rounded"
-                    >
-                      <Plus size={16} />
-                    </button>
-                  </div>
+                  <span className={styles.breakdownAmount}>{item.amount} kg</span>
                 </div>
               ))}
             </div>
+          </div>
 
-            <div className="mt-8 text-center">
-              <button
-                onClick={completeAudit}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
-              >
-                Complete Waste Audit
-              </button>
+          <div className={styles.recommendations}>
+            <h3 className={styles.recommendationsTitle}>Recommendations</h3>
+            <div className={styles.recommendationsList}>
+              {recommendations.map((rec, index) => (
+                <div key={index} className={styles.recommendationItem}>
+                  <span className={styles.recommendationBullet}></span>
+                  <span className={styles.recommendationText}>{rec}</span>
+                </div>
+              ))}
             </div>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Results Summary */}
-            <div className="bg-white rounded-xl shadow-2xl p-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">📈 Your Waste Analysis</h2>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-3xl font-bold text-blue-600">{stats.totalWaste.toFixed(1)}</div>
-                  <div className="text-gray-600">Total Waste (kg)</div>
+          <button onClick={resetAudit} className={styles.resetButton}>
+            <RotateCcw size={20} />
+            Start New Audit
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Eco Waste Audit</h1>
+        <div className={styles.titleIcon}>
+          <BarChart3 size={32} />
+        </div>
+        <p className={styles.subtitle}>Track and analyze your household waste to improve recycling habits!</p>
+      </div>
+
+      <div className={styles.trackingCard}>
+        <div className={styles.trackingHeader}>
+          <h2 className={styles.trackingTitle}>Weekly Waste Tracking</h2>
+          <p className={styles.trackingSubtitle}>
+            Estimate how much waste you generate in each category per week:
+          </p>
+        </div>
+
+        <div className={styles.wasteGrid}>
+          {wasteItems.map((item, index) => (
+            <div key={item.category} className={styles.wasteItem}>
+              <div className={styles.wasteHeader}>
+                <div className={styles.wasteInfo}>
+                  {item.recyclable ? (
+                    <Recycle className={styles.recycleIcon} size={20} />
+                  ) : (
+                    <Trash2 className={styles.trashIcon} size={20} />
+                  )}
+                  <span className={styles.wasteName}>{item.category}</span>
                 </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-3xl font-bold text-green-600">{stats.recyclableWaste.toFixed(1)}</div>
-                  <div className="text-gray-600">Recyclable (kg)</div>
-                </div>
-                <div className="text-center p-4 bg-red-50 rounded-lg">
-                  <div className="text-3xl font-bold text-red-600">{stats.nonRecyclableWaste.toFixed(1)}</div>
-                  <div className="text-gray-600">Non-recyclable (kg)</div>
-                </div>
-                <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                  <div className="text-3xl font-bold text-yellow-600">{stats.recyclingRate.toFixed(1)}%</div>
-                  <div className="text-gray-600">Recycling Rate</div>
-                </div>
+                <span className={`${styles.wasteBadge} ${
+                  item.recyclable ? styles.recyclableBadge : styles.nonRecyclableBadge
+                }`}>
+                  {item.recyclable ? 'Recyclable' : 'Non-recyclable'}
+                </span>
               </div>
 
-              {/* Detailed Breakdown */}
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Waste Breakdown</h3>
-                <div className="space-y-3">
-                  {wasteItems.map((item) => (
-                    <div key={item.category} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                      <div className="flex items-center gap-3">
-                        {item.recyclable ? (
-                          <Recycle className="text-green-500" size={16} />
-                        ) : (
-                          <Trash2 className="text-gray-500" size={16} />
-                        )}
-                        <span className="font-medium">{item.category}</span>
-                      </div>
-                      <span className="font-bold text-blue-600">{item.amount} kg</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Recommendations */}
-            <div className="bg-white rounded-xl shadow-2xl p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">💡 Recommendations</h2>
-              <div className="space-y-3">
-                {recommendations.map((rec, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-                    <span className="text-green-600 mt-1">•</span>
-                    <span className="text-gray-700">{rec}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 text-center">
+              <div className={styles.wasteControls}>
                 <button
-                  onClick={resetAudit}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+                  onClick={() => updateAmount(index, -0.5)}
+                  className={styles.decreaseButton}
                 >
-                  Start New Audit
+                  <Minus size={16} />
+                </button>
+
+                <div className={styles.amountDisplay}>
+                  <div className={styles.amountValue}>{item.amount}</div>
+                  <div className={styles.amountUnit}>{item.unit}</div>
+                </div>
+
+                <button
+                  onClick={() => updateAmount(index, 0.5)}
+                  className={styles.increaseButton}
+                >
+                  <Plus size={16} />
                 </button>
               </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+
+        <div className={styles.completeSection}>
+          <button onClick={completeAudit} className={styles.completeButton}>
+            Complete Waste Audit
+          </button>
+        </div>
       </div>
     </div>
   );

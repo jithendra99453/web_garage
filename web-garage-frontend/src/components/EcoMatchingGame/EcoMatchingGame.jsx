@@ -1,13 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 import { Leaf, Award, RotateCcw, CheckCircle } from 'lucide-react';
 
 const EcoMatchingGame = () => {
+  // 1. CONNECT
+  const { refreshStudentData } = useContext(UserContext);
+
+  // 2. MANAGE STATE
   const [cards, setCards] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState([]);
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
+  // 3. SAVE SCORE ON GAME END
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (gameComplete && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [gameComplete, score, refreshStudentData]);
 
   const cardPairs = [
     { id: 1, term: 'Carbon Footprint', definition: 'The total amount of greenhouse gases produced by human activities' },
@@ -25,6 +41,8 @@ const EcoMatchingGame = () => {
   }, []);
 
   const initializeGame = () => {
+    setScore(0);
+    setGameComplete(false);
     const gameCards = [];
     cardPairs.forEach(pair => {
       gameCards.push({

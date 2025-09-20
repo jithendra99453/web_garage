@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import styles from './EcoEnergyQuiz.module.css';
 import { Zap, CheckCircle, XCircle } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoEnergyQuiz = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -68,6 +72,17 @@ const EcoEnergyQuiz = () => {
     setShowExplanation(false);
   };
 
+  // Award eco points and refresh dashboard when quiz is complete
+  useEffect(() => {
+    if (showResult && score > 0) {
+      const points = score * 10; // 10 points per correct answer
+      awardPoints(points).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showResult]);
+
   const getScoreMessage = () => {
     const percentage = (score / questions.length) * 100;
     if (percentage >= 80) return "Excellent! You're an energy expert! ⚡";
@@ -78,13 +93,12 @@ const EcoEnergyQuiz = () => {
 
   if (showResult) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-100 to-orange-100 p-4 flex flex-col items-center justify-center">
-        <div className="bg-white rounded-xl shadow-2xl p-8 text-center max-w-md w-full">
+      <div className={styles.container}>
+        <div className={styles.card}>
           <Zap className="mx-auto text-yellow-500 mb-4" size={48} />
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
-          <div className="text-5xl font-bold text-yellow-600 mb-2">{score}/{questions.length}</div>
+          <h2 className={styles.title}>Quiz Complete!</h2>
+          <div className={styles.score}>{score}/{questions.length}</div>
           <p className="text-lg text-gray-600 mb-6">{getScoreMessage()}</p>
-
           <div className="bg-yellow-50 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-gray-800 mb-2">💡 Energy Saving Tips:</h3>
             <ul className="text-left text-sm text-gray-700 space-y-1">
@@ -95,10 +109,9 @@ const EcoEnergyQuiz = () => {
               <li>• Use a programmable thermostat</li>
             </ul>
           </div>
-
           <button
             onClick={resetQuiz}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold"
+            className={styles.button}
           >
             Take Quiz Again
           </button>

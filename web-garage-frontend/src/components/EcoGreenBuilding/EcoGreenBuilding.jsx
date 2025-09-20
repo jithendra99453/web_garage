@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Home, RotateCcw, Trophy, Leaf } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoGreenBuilding = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [building, setBuilding] = useState({
     foundation: false,
     walls: false,
@@ -127,6 +130,18 @@ const EcoGreenBuilding = () => {
     setBudget(1000);
     setEfficiency(0);
   };
+
+  // Award eco points and refresh dashboard when game is over
+  useEffect(() => {
+    if (gameOver && score > 0) {
+      // Use finalScore for points
+      const finalScore = score + (efficiency * 3) + (budget * 0.5);
+      awardPoints(Math.round(finalScore)).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
 
   const getEfficiencyRating = () => {
     if (efficiency >= 150) return { rating: "Exceptional", color: "text-green-600", emoji: "🌟" };

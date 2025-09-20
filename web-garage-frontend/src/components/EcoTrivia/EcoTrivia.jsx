@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Leaf, Award, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
+import  UserContext  from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoTrivia = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -79,6 +82,16 @@ const EcoTrivia = () => {
     setScore(0);
     setGameComplete(false);
   };
+
+  // Award eco points and refresh dashboard when game is complete
+  useEffect(() => {
+    if (gameComplete && score > 0) {
+      awardPoints(score).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameComplete]);
 
   if (gameComplete) {
     return (

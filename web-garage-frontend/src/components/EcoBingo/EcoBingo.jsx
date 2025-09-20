@@ -1,11 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 import { CheckCircle, X, RotateCcw } from 'lucide-react';
 
 const EcoBingo = () => {
+  // 1. CONNECT
+  const { refreshStudentData } = useContext(UserContext);
+
+  // 2. MANAGE STATE
   const [board, setBoard] = useState([]);
   const [marked, setMarked] = useState(new Set());
   const [hasWon, setHasWon] = useState(false);
   const [score, setScore] = useState(0);
+  // 3. SAVE SCORE ON GAME END
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (hasWon && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [hasWon, score, refreshStudentData]);
 
   const ecoFacts = [
     "Reduce, Reuse, Recycle",
@@ -40,6 +56,8 @@ const EcoBingo = () => {
   }, []);
 
   const initializeBoard = () => {
+    setScore(0);
+    setHasWon(false);
     const shuffled = [...ecoFacts].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 25);
     const newBoard = [];

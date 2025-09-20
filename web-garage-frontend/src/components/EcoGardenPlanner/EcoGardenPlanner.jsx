@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 import { Sprout, Sun, Droplets, Wind } from 'lucide-react';
 
 const EcoGardenPlanner = () => {
+  // 1. CONNECT
+  const { refreshStudentData } = useContext(UserContext);
+
+  // 2. MANAGE STATE
   const [garden, setGarden] = useState(Array(9).fill(null));
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [season, setSeason] = useState('spring');
   const [score, setScore] = useState(0);
+  const [gameComplete, setGameComplete] = useState(false);
+  // 3. SAVE SCORE ON GAME END
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (gameComplete && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [gameComplete, score, refreshStudentData]);
 
   const plants = {
     spring: [
@@ -58,6 +75,11 @@ const EcoGardenPlanner = () => {
     const finalPoints = selectedPlant.points + compatibilityBonus;
 
     setScore(prev => prev + finalPoints);
+
+    // If garden is full, set gameComplete
+    if (newGarden.every(cell => cell !== null)) {
+      setGameComplete(true);
+    }
   };
 
   const calculateGardenHealth = () => {
@@ -81,6 +103,7 @@ const EcoGardenPlanner = () => {
     setGarden(Array(9).fill(null));
     setScore(0);
     setSelectedPlant(null);
+    setGameComplete(false);
   };
 
   const gardenHealth = calculateGardenHealth();

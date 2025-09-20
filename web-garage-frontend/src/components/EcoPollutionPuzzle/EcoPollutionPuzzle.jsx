@@ -1,12 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 import { Factory, Car, TreePine, Wind, RotateCcw } from 'lucide-react';
 
 const EcoPollutionPuzzle = () => {
+  // 1. CONNECT
+  const { refreshStudentData } = useContext(UserContext);
+
+  // 2. MANAGE STATE
   const [puzzlePieces, setPuzzlePieces] = useState([]);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(120);
   const [gameOver, setGameOver] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
+  // 3. SAVE SCORE ON GAME END
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (gameOver && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [gameOver, score, refreshStudentData]);
 
   const pollutionSources = [
     { id: 1, name: "Factory Smoke", emoji: "🏭", type: "air", solution: "clean_energy" },
@@ -40,6 +56,8 @@ const EcoPollutionPuzzle = () => {
   }, [timeLeft, gameOver]);
 
   const initializePuzzle = () => {
+    setScore(0);
+    setGameOver(false);
     const shuffledSources = [...pollutionSources].sort(() => Math.random() - 0.5);
     const shuffledSolutions = [...solutions].sort(() => Math.random() - 0.5);
 

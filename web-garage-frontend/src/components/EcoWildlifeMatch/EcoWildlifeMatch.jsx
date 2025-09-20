@@ -1,12 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 import { Heart, RotateCcw } from 'lucide-react';
 
 const EcoWildlifeMatch = () => {
+  // 1. CONNECT
+  const { refreshStudentData } = useContext(UserContext);
+
+  // 2. MANAGE STATE
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
   const [moves, setMoves] = useState(0);
   const [gameWon, setGameWon] = useState(false);
+  // 3. SAVE SCORE ON GAME END
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (gameWon) {
+        const score = getScore();
+        if (score > 0) {
+          await awardPoints(score);
+          refreshStudentData();
+        }
+      }
+    };
+    saveFinalScore();
+  }, [gameWon, refreshStudentData]);
 
   const wildlifePairs = [
     { id: 1, name: "Panda", emoji: "🐼", habitat: "Bamboo forests" },
@@ -28,6 +47,8 @@ const EcoWildlifeMatch = () => {
   }, [matched]);
 
   const initializeGame = () => {
+    setMoves(0);
+    setGameWon(false);
     const gameCards = wildlifePairs.flatMap(pair => [
       { ...pair, uniqueId: `${pair.id}-name` },
       { ...pair, uniqueId: `${pair.id}-emoji` }

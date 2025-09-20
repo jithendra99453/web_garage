@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Fish, RotateCcw, Trophy, Trash2 } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoOceanCleanup = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [marineLife, setMarineLife] = useState([]);
   const [trash, setTrash] = useState([]);
   const [score, setScore] = useState(0);
@@ -144,6 +147,17 @@ const EcoOceanCleanup = () => {
     setLevel(1);
     setLives(3);
   };
+
+  // Award eco points and refresh dashboard when game is over
+  useEffect(() => {
+    if (gameOver && score > 0) {
+      const finalScore = score + (lives * 50) + (level * 100);
+      awardPoints(finalScore).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
 
   const collectedTrash = trash.filter(t => t.collected).length;
   const rescuedLife = marineLife.filter(l => l.rescued).length;

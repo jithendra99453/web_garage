@@ -1,12 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 import { Leaf, Award, RotateCcw, Trash2, Recycle, Home } from 'lucide-react';
 
 const EcoSortingGame = () => {
+  // 1. CONNECT
+  const { refreshStudentData } = useContext(UserContext);
+
+  // 2. MANAGE STATE
   const [items, setItems] = useState([]);
   const [score, setScore] = useState(0);
   const [currentItem, setCurrentItem] = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
   const [feedback, setFeedback] = useState('');
+  // 3. SAVE SCORE ON GAME END
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (gameComplete && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [gameComplete, score, refreshStudentData]);
 
   const wasteItems = [
     { name: 'Plastic Bottle', category: 'recycle', icon: '🥤', explanation: 'Plastic bottles can be recycled into new plastic products.' },
@@ -26,6 +42,8 @@ const EcoSortingGame = () => {
   }, []);
 
   const initializeGame = () => {
+    setScore(0);
+    setGameComplete(false);
     const shuffledItems = [...wasteItems].sort(() => Math.random() - 0.5);
     setItems(shuffledItems);
     setCurrentItem(0);

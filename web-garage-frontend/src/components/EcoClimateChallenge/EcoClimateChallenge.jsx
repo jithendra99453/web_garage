@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Thermometer, CloudRain, Wind, Sun } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import styles from './EcoClimateChallenge.module.css';
+import { Thermometer, CloudRain, RotateCcw, Zap } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoClimateChallenge = () => {
+  // 1. CONNECT to the context
+  const { refreshStudentData } = useContext(UserContext);
+  
+  // 2. MANAGE game state
   const [temperature, setTemperature] = useState(15);
   const [co2Level, setCo2Level] = useState(400);
   const [actions, setActions] = useState([]);
@@ -9,6 +16,7 @@ const EcoClimateChallenge = () => {
   const [timeLeft, setTimeLeft] = useState(120);
   const [gameOver, setGameOver] = useState(false);
 
+  // Game data
   const climateActions = [
     { id: 1, name: "Plant Trees", icon: "🌳", tempEffect: -0.5, co2Effect: -20, points: 50 },
     { id: 2, name: "Use Solar Power", icon: "☀️", tempEffect: -0.3, co2Effect: -15, points: 40 },
@@ -18,19 +26,31 @@ const EcoClimateChallenge = () => {
     { id: 6, name: "Go Vegetarian", icon: "🥕", tempEffect: -0.6, co2Effect: -30, points: 55 }
   ];
 
+  // Timer Effect
   useEffect(() => {
     if (timeLeft > 0 && !gameOver) {
       const timer = setTimeout(() => {
         setTimeLeft(timeLeft - 1);
-        // Simulate climate change progression
+        // Simulate gradual climate change progression
         setTemperature(prev => prev + 0.01);
         setCo2Level(prev => prev + 0.5);
       }, 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && !gameOver) {
       setGameOver(true);
     }
   }, [timeLeft, gameOver]);
+
+  // 3. SAVE score when the game ends
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (gameOver && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [gameOver, score, refreshStudentData]);
 
   const performAction = (action) => {
     if (gameOver) return;
@@ -42,10 +62,10 @@ const EcoClimateChallenge = () => {
   };
 
   const getClimateStatus = () => {
-    if (temperature < 14) return { status: "Cooling", color: "text-blue-600", icon: "❄️" };
-    if (temperature < 16) return { status: "Stable", color: "text-green-600", icon: "✅" };
-    if (temperature < 18) return { status: "Warming", color: "text-yellow-600", icon: "🌡️" };
-    return { status: "Critical", color: "text-red-600", icon: "🔥" };
+    if (temperature < 14) return { status: "Cooling", color: styles.cooling, icon: "❄️" };
+    if (temperature < 16) return { status: "Stable", color: styles.stable, icon: "✅" };
+    if (temperature < 18) return { status: "Warming", color: styles.warning, icon: "🌡️" };
+    return { status: "Critical", color: styles.critical, icon: "🔥" };
   };
 
   const resetGame = () => {
@@ -59,134 +79,139 @@ const EcoClimateChallenge = () => {
 
   const climateStatus = getClimateStatus();
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-green-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-800 mb-2">🌡️ Eco Climate Challenge</h1>
-          <p className="text-lg text-gray-600">Take action to combat climate change before time runs out!</p>
-
-          <div className="flex justify-center items-center gap-6 mt-4">
-            <div className="bg-white px-4 py-2 rounded-lg shadow">
-              <span className="text-2xl font-bold text-green-600">{score}</span>
-              <span className="text-gray-600 ml-2">Points</span>
-            </div>
-            <div className="bg-white px-4 py-2 rounded-lg shadow">
-              <span className="text-2xl font-bold text-blue-600">{timeLeft}</span>
-              <span className="text-gray-600 ml-2">Seconds</span>
-            </div>
-            <button
-              onClick={resetGame}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            >
-              Reset
-            </button>
+  if (gameOver) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.gameOverModal}>
+          <div className={styles.gameOverIcon}>
+            {temperature < 16 ? '🎉' : '⚠️'}
           </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* Climate Dashboard */}
-          <div className="bg-white rounded-xl shadow-2xl p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">🌍 Climate Dashboard</h2>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Thermometer className="text-red-500" size={24} />
-                  <span className="text-lg font-medium">Temperature</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-red-600">{temperature.toFixed(1)}°C</div>
-                  <div className={`text-sm font-medium ${climateStatus.color}`}>
-                    {climateStatus.icon} {climateStatus.status}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CloudRain className="text-blue-500" size={24} />
-                  <span className="text-lg font-medium">CO₂ Level</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-600">{co2Level.toFixed(0)} ppm</div>
-                  <div className="text-sm text-gray-600">Atmospheric CO₂</div>
-                </div>
-              </div>
-
-              <div className="bg-gray-100 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-800 mb-2">Recent Actions:</h3>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {actions.slice(-5).map((action, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm">
-                      <span>{action.icon}</span>
-                      <span>{action.name}</span>
-                      <span className="text-green-600">+{action.points}pts</span>
-                    </div>
-                  ))}
-                  {actions.length === 0 && (
-                    <p className="text-gray-500 text-sm">No actions taken yet</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="bg-white rounded-xl shadow-2xl p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">⚡ Climate Actions</h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              {climateActions.map((action) => (
-                <button
-                  key={action.id}
-                  onClick={() => performAction(action)}
-                  disabled={gameOver}
-                  className="p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border-2 border-gray-200 hover:border-green-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <div className="text-2xl mb-2">{action.icon}</div>
-                  <div className="text-sm font-medium text-gray-800 mb-1">{action.name}</div>
-                  <div className="text-xs text-green-600">+{action.points} pts</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {gameOver && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-xl p-8 text-center shadow-2xl max-w-md">
-              <div className="text-6xl mb-4">{temperature < 16 ? '🎉' : '⚠️'}</div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Time's Up!</h2>
-              <p className="text-lg text-gray-600 mb-4">
-                {temperature < 16
-                  ? "Great job! You helped stabilize the climate!"
-                  : "The climate is still warming. Try taking more actions next time!"
-                }
-              </p>
-              <div className="text-4xl font-bold text-green-600 mb-4">{score} Points</div>
-
-              <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-blue-800 mb-2">🌡️ Final Climate State:</h3>
-                <p className="text-gray-700">Temperature: {temperature.toFixed(1)}°C</p>
-                <p className="text-gray-700">CO₂ Level: {co2Level.toFixed(0)} ppm</p>
-                <p className="text-gray-700">Actions Taken: {actions.length}</p>
-              </div>
-
-              <button
-                onClick={resetGame}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold"
-              >
-                Play Again
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="text-center">
-          <p className="text-gray-600">
-            Take climate actions to reduce temperature and CO₂ levels before time runs out!
+          <h2 className={styles.gameOverTitle}>Time's Up!</h2>
+          <p className={styles.gameOverMessage}>
+            {temperature < 16
+              ? "Excellent work! You helped stabilize the climate!"
+              : "The climate is still warming. Try taking more actions next time!"
+            }
           </p>
+          <div className={styles.finalScoreDisplay}>{score} Points</div>
+          <div className={styles.pointsEarned}>
+            You earned {score} eco points!
+          </div>
+          <div className={styles.finalStats}>
+            <h3 className={styles.finalStatsTitle}>Final Climate State:</h3>
+            <div className={styles.finalStatsGrid}>
+              <div className={styles.finalStat}>
+                <span>Temperature:</span>
+                <span>{temperature.toFixed(1)}°C</span>
+              </div>
+              <div className={styles.finalStat}>
+                <span>CO₂ Level:</span>
+                <span>{co2Level.toFixed(0)} ppm</span>
+              </div>
+              <div className={styles.finalStat}>
+                <span>Actions Taken:</span>
+                <span>{actions.length}</span>
+              </div>
+            </div>
+          </div>
+          <button onClick={resetGame} className={styles.playAgainButton}>
+            <RotateCcw size={18} />
+            Play Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Eco Climate Challenge</h1>
+        <div className={styles.titleIcon}>
+          <Thermometer size={32} />
+        </div>
+        <p className={styles.subtitle}>Take action to combat climate change before time runs out!</p>
+        
+        <div className={styles.statsBar}>
+          <div className={styles.statBox}>
+            <span className={styles.statValue}>{score}</span>
+            <span className={styles.statLabel}>Points</span>
+          </div>
+          <div className={styles.statBox}>
+            <span className={styles.statValue}>{timeLeft}</span>
+            <span className={styles.statLabel}>Seconds</span>
+          </div>
+          <button onClick={resetGame} className={styles.resetButton}>
+            <RotateCcw size={16} />
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.gameGrid}>
+        <div className={styles.dashboardCard}>
+          <h2 className={styles.cardTitle}>Climate Dashboard</h2>
+          
+          <div className={styles.metricsGrid}>
+            <div className={styles.metric}>
+              <div className={styles.metricHeader}>
+                <Thermometer className={styles.tempIcon} size={24} />
+                <span>Temperature</span>
+              </div>
+              <div className={styles.metricValue}>
+                <div className={styles.valueNumber}>{temperature.toFixed(1)}°C</div>
+                <div className={`${styles.valueStatus} ${climateStatus.color}`}>
+                  {climateStatus.icon} {climateStatus.status}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.metric}>
+              <div className={styles.metricHeader}>
+                <CloudRain className={styles.co2Icon} size={24} />
+                <span>CO₂ Level</span>
+              </div>
+              <div className={styles.metricValue}>
+                <div className={styles.valueNumber}>{co2Level.toFixed(0)} ppm</div>
+                <div className={styles.valueStatus}>Atmospheric CO₂</div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.actionsLog}>
+            <h3 className={styles.logTitle}>Recent Actions:</h3>
+            <div className={styles.actionsList}>
+              {actions.length === 0 ? (
+                <p className={styles.noActions}>No actions taken yet</p>
+              ) : (
+                actions.slice(-5).map((action, index) => (
+                  <div key={index} className={styles.actionItem}>
+                    <span className={styles.actionIcon}>{action.icon}</span>
+                    <span className={styles.actionName}>{action.name}</span>
+                    <span className={styles.actionPoints}>+{action.points}pts</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.actionsCard}>
+          <h2 className={styles.cardTitle}>Climate Actions</h2>
+          <div className={styles.actionsGrid}>
+            {climateActions.map((action) => (
+              <button
+                key={action.id}
+                onClick={() => performAction(action)}
+                disabled={gameOver}
+                className={styles.actionButton}
+              >
+                <div className={styles.buttonIcon}>{action.icon}</div>
+                <div className={styles.buttonName}>{action.name}</div>
+                <div className={styles.buttonPoints}>+{action.points} pts</div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

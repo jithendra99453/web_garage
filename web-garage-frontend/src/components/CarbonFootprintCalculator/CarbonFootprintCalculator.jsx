@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Calculator, Leaf, Car, Home, Zap, Utensils } from 'lucide-react';
 import styles from './CarbonFootprintCalculator.module.css';
+import UserContext from '../../context/UserContext'; // Adjust path if needed
+import { awardPoints } from '../../utils/api';      // Adjust path if needed
 
 const CarbonFootprintCalculator = () => {
+  // --- States for calculator logic ---
   const [answers, setAnswers] = useState({
     transportation: '',
     home: '',
@@ -11,6 +14,13 @@ const CarbonFootprintCalculator = () => {
   });
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
+
+  // --- Step 1: Connect to Context ---
+  const { refreshStudentData } = useContext(UserContext);
+
+  // --- Step 2: Manage Game-Specific State ---
+  const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false); // This will trigger the point award
 
   const questions = {
     transportation: {
@@ -53,15 +63,42 @@ const CarbonFootprintCalculator = () => {
     }
   };
 
+  // --- Step 3: Add the Score-Saving useEffect Hook ---
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      // Only run if the calculation is complete and points were awarded
+      if (gameOver && score > 0) {
+        console.log(`Calculator complete! Awarding ${score} eco points.`);
+        await awardPoints(score);
+        refreshStudentData();
+
+        // Reset the gameOver flag so it can be triggered again after a reset
+        setGameOver(false);
+      }
+    };
+    saveFinalScore();
+  }, [gameOver, score, refreshStudentData]);
+
   const calculateFootprint = () => {
     const total = Object.values(answers).reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
+
+    // --- Point Calculation Logic ---
+    let pointsToAward = 0;
+    if (total < 10) {
+      pointsToAward = 100; // Excellent
+    } else if (total < 20) {
+      pointsToAward = 50;  // Good
+    } else {
+      pointsToAward = 25;  // Needs improvement
+    }
+    setScore(pointsToAward);
+
+    // --- Result Calculation Logic ---
     const weekly = total * 7;
     const monthly = total * 30;
     const yearly = total * 365;
-
     let assessment = '';
     let tips = [];
-
     if (total < 10) {
       assessment = 'Excellent! Your carbon footprint is very low.';
       tips = ['Keep up the great work!', 'Consider sharing your sustainable habits with others.'];
@@ -81,7 +118,9 @@ const CarbonFootprintCalculator = () => {
       assessment,
       tips
     });
+    
     setShowResult(true);
+    setGameOver(true); // This triggers the useEffect to save the score
   };
 
   const handleAnswerChange = (category, value) => {
@@ -100,6 +139,8 @@ const CarbonFootprintCalculator = () => {
     });
     setResult(null);
     setShowResult(false);
+    setScore(0);
+    setGameOver(false);
   };
 
   const allAnswered = Object.values(answers).every(answer => answer !== '');
@@ -162,6 +203,11 @@ const CarbonFootprintCalculator = () => {
             <div className={styles.resultHeader}>
               <Leaf className={styles.resultIcon} size={48} />
               <h2 className={styles.resultTitle}>Your Carbon Footprint</h2>
+            </div>
+            
+            <div className={styles.pointsAwarded}>
+              <h3>Congratulations! 🎉</h3>
+              <p>For calculating your footprint, you've earned <strong>{score} eco points!</strong></p>
             </div>
 
             <div className={styles.statsGrid}>

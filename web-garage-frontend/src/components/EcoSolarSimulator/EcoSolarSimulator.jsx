@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Sun, Battery, Zap, RotateCcw } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoSolarSimulator = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [panels, setPanels] = useState(4);
   const [sunlight, setSunlight] = useState(70); // percentage
   const [batteryLevel, setBatteryLevel] = useState(50);
@@ -9,6 +12,15 @@ const EcoSolarSimulator = () => {
   const [timeOfDay, setTimeOfDay] = useState(12); // 24-hour format
   const [weather, setWeather] = useState('sunny');
   const [score, setScore] = useState(0);
+  // Award eco points and refresh dashboard when day is complete
+  useEffect(() => {
+    if (dayComplete && score > 0) {
+      awardPoints(score).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dayComplete]);
   const [dayComplete, setDayComplete] = useState(false);
 
   const weatherConditions = {

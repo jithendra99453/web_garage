@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Droplet, Zap, RefreshCw } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 import styles from './EcoWaterSaver.module.css';
 
 const EcoWaterSaver = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [waterUsed, setWaterUsed] = useState(0);
   const [goal, setGoal] = useState(100); // liters per day goal
   const [feedback, setFeedback] = useState('');
   const [timer, setTimer] = useState(60);
   const [gameOver, setGameOver] = useState(false);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     if (timer > 0 && !gameOver) {
@@ -17,11 +21,23 @@ const EcoWaterSaver = () => {
       setGameOver(true);
       if (waterUsed <= goal) {
         setFeedback('Great job! You saved water today! 💧');
+        setScore(10); // Award 10 points for saving water
       } else {
         setFeedback('Try to reduce your water usage next time! 🚿');
+        setScore(0);
       }
     }
   }, [timer, gameOver, waterUsed, goal]);
+
+  // Award eco points and refresh dashboard when game is over and user saved water
+  useEffect(() => {
+    if (gameOver && score > 0) {
+      awardPoints(score).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
 
   const handleUseWater = () => {
     if (gameOver) return;
@@ -38,6 +54,7 @@ const EcoWaterSaver = () => {
     setTimer(60);
     setGameOver(false);
     setFeedback('');
+    setScore(0);
   };
 
   return (
@@ -74,6 +91,7 @@ const EcoWaterSaver = () => {
         {gameOver && (
           <>
             <div className={styles.feedback}>{feedback}</div>
+            <div className={styles.score}>Eco Points: {score}</div>
             <button
               onClick={resetGame}
               className={styles.playAgainButton}

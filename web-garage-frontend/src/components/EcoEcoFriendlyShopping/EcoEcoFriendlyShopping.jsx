@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ShoppingCart, RotateCcw, Trophy, CheckCircle, XCircle } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoEcoFriendlyShopping = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [currentItem, setCurrentItem] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
@@ -168,6 +171,16 @@ const EcoEcoFriendlyShopping = () => {
     setStreak(0);
     setBudget(100);
   };
+
+  // Award eco points and refresh dashboard when game is over
+  useEffect(() => {
+    if (gameOver && score > 0) {
+      awardPoints(score).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
 
   const getScoreRating = () => {
     const ecoChoices = Math.floor(score / 20); // Approximate eco choices made

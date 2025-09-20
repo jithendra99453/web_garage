@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Zap, RotateCcw, Trophy, Wind } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoRenewableEnergy = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [energySources, setEnergySources] = useState({
     solar: { level: 0, maxLevel: 5, cost: [0, 100, 200, 350, 500, 700] },
     wind: { level: 0, maxLevel: 5, cost: [0, 120, 240, 400, 600, 850] },
@@ -109,6 +112,17 @@ const EcoRenewableEnergy = () => {
     setEnergyOutput(0);
     setCo2Reduction(0);
   };
+
+  // Award eco points and refresh dashboard when game is over
+  useEffect(() => {
+    if (gameOver && score > 0) {
+      const finalScore = score + (energyOutput * 1.5) + (co2Reduction * 3) + (budget * 0.5);
+      awardPoints(Math.round(finalScore)).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
 
   const getEfficiencyRating = () => {
     const totalLevels = Object.values(energySources).reduce((sum, source) => sum + source.level, 0);

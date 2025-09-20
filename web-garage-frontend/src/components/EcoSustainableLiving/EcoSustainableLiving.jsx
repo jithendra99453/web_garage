@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Home, RotateCcw, Trophy, Leaf } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoSustainableLiving = () => {
+  const { refreshStudentData } = useContext(UserContext);
   const [currentChallenge, setCurrentChallenge] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(45);
@@ -185,6 +188,16 @@ const EcoSustainableLiving = () => {
     setStreak(0);
     setLives(3);
   };
+
+  // Award eco points and refresh dashboard when game is over
+  useEffect(() => {
+    if (gameOver && score > 0) {
+      awardPoints(score).then(() => {
+        refreshStudentData();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
 
   const getScoreRating = () => {
     const correctAnswers = completedChallenges.length;

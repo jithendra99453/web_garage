@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Apple, Carrot, Wheat, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import styles from './EcoFoodWasteGame.module.css';
+import { Apple, RotateCcw, Clock, Target } from 'lucide-react';
+import UserContext from '../../context/UserContext';
+import { awardPoints } from '../../utils/api';
 
 const EcoFoodWasteGame = () => {
+  // 1. CONNECT to the context
+  const { refreshStudentData } = useContext(UserContext);
+  
+  // 2. MANAGE game state
   const [foodItems, setFoodItems] = useState([]);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(90);
@@ -24,10 +31,12 @@ const EcoFoodWasteGame = () => {
     "Cooking too much"
   ];
 
+  // Generate food items when round changes
   useEffect(() => {
     generateFoodItems();
   }, [currentRound]);
 
+  // Timer effect
   useEffect(() => {
     if (timeLeft > 0 && !gameOver) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -36,6 +45,17 @@ const EcoFoodWasteGame = () => {
       setGameOver(true);
     }
   }, [timeLeft, gameOver]);
+
+  // 3. SAVE score when the game ends
+  useEffect(() => {
+    const saveFinalScore = async () => {
+      if (gameOver && score > 0) {
+        await awardPoints(score);
+        refreshStudentData();
+      }
+    };
+    saveFinalScore();
+  }, [gameOver, score, refreshStudentData]);
 
   const generateFoodItems = () => {
     const items = [];
@@ -104,6 +124,7 @@ const EcoFoodWasteGame = () => {
     setTimeLeft(90);
     setGameOver(false);
     setCurrentRound(1);
+    generateFoodItems();
   };
 
   const allItemsHandled = foodItems.every(item => item.saved || item.wasted);
@@ -111,51 +132,52 @@ const EcoFoodWasteGame = () => {
   const wastedItems = foodItems.filter(item => item.wasted).length;
 
   if (gameOver) {
-    const totalPossibleScore = 8 * 10; // 8 items * 10 points each
-    const efficiency = (savedItems / 8) * 100;
+    const efficiency = savedItems > 0 ? (savedItems / (savedItems + wastedItems)) * 100 : 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-100 to-orange-100 p-4 flex flex-col items-center justify-center">
-        <div className="bg-white rounded-xl shadow-2xl p-8 text-center max-w-2xl w-full">
-          <div className="text-6xl mb-4">{efficiency >= 70 ? '🥳' : '🤔'}</div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Game Over!</h2>
-          <div className="text-4xl font-bold text-green-600 mb-2">{score} Points</div>
-          <p className="text-lg text-gray-600 mb-6">
-            You saved {savedItems} out of 8 food items ({efficiency.toFixed(1)}% efficiency)
+      <div className={styles.container}>
+        <div className={styles.gameOverCard}>
+          <div className={styles.gameOverIcon}>
+            {efficiency >= 70 ? '🎉' : '🤔'}
+          </div>
+          <h2 className={styles.gameOverTitle}>Game Over!</h2>
+          <div className={styles.finalScore}>{score} Points</div>
+          <div className={styles.pointsEarned}>
+            You earned {score} eco points!
+          </div>
+          <p className={styles.gameOverMessage}>
+            You saved {savedItems} out of {savedItems + wastedItems} food items ({efficiency.toFixed(1)}% efficiency)
           </p>
-
-          <div className="grid md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{savedItems}</div>
-              <div className="text-sm text-gray-600">Items Saved</div>
+          
+          <div className={styles.finalStatsGrid}>
+            <div className={styles.finalStat}>
+              <div className={styles.statNumber}>{savedItems}</div>
+              <div className={styles.statLabel}>Items Saved</div>
             </div>
-            <div className="bg-red-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">{wastedItems}</div>
-              <div className="text-sm text-gray-600">Items Wasted</div>
+            <div className={styles.finalStat}>
+              <div className={styles.statNumber}>{wastedItems}</div>
+              <div className={styles.statLabel}>Items Wasted</div>
             </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{efficiency.toFixed(1)}%</div>
-              <div className="text-sm text-gray-600">Efficiency</div>
+            <div className={styles.finalStat}>
+              <div className={styles.statNumber}>{efficiency.toFixed(1)}%</div>
+              <div className={styles.statLabel}>Efficiency</div>
             </div>
           </div>
-
-          <div className="bg-orange-50 rounded-lg p-6 mb-6">
-            <h3 className="font-semibold text-orange-800 mb-2">🍎 Food Waste Prevention Tips:</h3>
-            <ul className="text-left text-sm text-gray-700 space-y-1">
-              <li>• Plan meals and make shopping lists</li>
-              <li>• Store food properly to extend freshness</li>
-              <li>• Use "first in, first out" inventory method</li>
-              <li>• Buy only what you need</li>
-              <li>• Compost food scraps when possible</li>
-              <li>• Use leftovers creatively</li>
+          
+          <div className={styles.tipsSection}>
+            <h3 className={styles.tipsTitle}>Food Waste Prevention Tips:</h3>
+            <ul className={styles.tipsList}>
+              <li>Plan meals and make shopping lists</li>
+              <li>Store food properly to extend freshness</li>
+              <li>Use "first in, first out" inventory method</li>
+              <li>Buy only what you need</li>
+              <li>Compost food scraps when possible</li>
+              <li>Use leftovers creatively</li>
             </ul>
           </div>
-
-          <button
-            onClick={resetGame}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            <RotateCcw size={20} className="inline mr-2" />
+          
+          <button onClick={resetGame} className={styles.playAgainButton}>
+            <RotateCcw size={20} />
             Play Again
           </button>
         </div>
@@ -164,102 +186,111 @@ const EcoFoodWasteGame = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-orange-800 mb-2">🍎 Eco Food Waste Game</h1>
-          <p className="text-lg text-gray-600">Decide whether to save or waste food items to reduce food waste!</p>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Eco Food Waste Game</h1>
+        <div className={styles.titleIcon}>
+          <Apple size={32} />
+        </div>
+        <p className={styles.subtitle}>Decide whether to save or waste food items to reduce food waste!</p>
 
-          <div className="flex justify-center items-center gap-6 mt-4">
-            <div className="bg-white px-4 py-2 rounded-lg shadow">
-              <span className="text-2xl font-bold text-green-600">{score}</span>
-              <span className="text-gray-600 ml-2">Points</span>
-            </div>
-            <div className="bg-white px-4 py-2 rounded-lg shadow">
-              <span className="text-2xl font-bold text-blue-600">{timeLeft}</span>
-              <span className="text-gray-600 ml-2">Seconds</span>
-            </div>
-            <div className="bg-white px-4 py-2 rounded-lg shadow">
-              <span className="text-2xl font-bold text-purple-600">Round {currentRound}/5</span>
-            </div>
+        <div className={styles.statsBar}>
+          <div className={styles.statBox}>
+            <span className={styles.statValue}>{score}</span>
+            <span className={styles.statLabel}>Points</span>
+          </div>
+          <div className={styles.statBox}>
+            <Clock className={styles.clockIcon} size={20} />
+            <span className={styles.statValue}>{timeLeft}</span>
+            <span className={styles.statLabel}>Seconds</span>
+          </div>
+          <div className={styles.statBox}>
+            <Target className={styles.targetIcon} size={20} />
+            <span className={styles.statValue}>Round {currentRound}/5</span>
           </div>
         </div>
+      </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {foodItems.map((item) => (
-            <div key={item.id} className={`bg-white rounded-lg p-4 shadow-lg border-2 ${
-              item.saved ? 'border-green-500 bg-green-50' :
-              item.wasted ? 'border-red-500 bg-red-50' :
-              'border-gray-200'
-            }`}>
-              <div className="text-center mb-3">
-                <div className="text-3xl mb-2">{foodCategories[item.category].icon}</div>
-                <div className="font-medium text-gray-800">{item.name}</div>
-                <div className="text-sm text-gray-600">{item.quantity} {item.quantity > 1 ? 'items' : 'item'}</div>
+      <div className={styles.foodGrid}>
+        {foodItems.map((item) => (
+          <div key={item.id} className={`${styles.foodItem} ${
+            item.saved ? styles.savedItem :
+            item.wasted ? styles.wastedItem :
+            styles.activeItem
+          }`}>
+            <div className={styles.foodHeader}>
+              <div className={styles.foodIcon}>
+                {foodCategories[item.category].icon}
               </div>
-
-              <div className="text-xs text-gray-500 mb-3 text-center">
-                Reason: {item.wasteReason}
+              <div className={styles.foodInfo}>
+                <div className={styles.foodName}>{item.name}</div>
+                <div className={styles.foodQuantity}>
+                  {item.quantity} {item.quantity > 1 ? 'items' : 'item'}
+                </div>
+                <div className={styles.foodCategory}>
+                  {foodCategories[item.category].name}
+                </div>
               </div>
-
-              {!item.saved && !item.wasted && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleFoodAction(item.id, 'save')}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded text-sm font-medium"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => handleFoodAction(item.id, 'waste')}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm font-medium"
-                  >
-                    Waste
-                  </button>
-                </div>
-              )}
-
-              {item.saved && (
-                <div className="text-center text-green-600 font-medium text-sm">
-                  ✓ Saved!
-                </div>
-              )}
-
-              {item.wasted && (
-                <div className="text-center text-red-600 font-medium text-sm">
-                  ✗ Wasted
-                </div>
-              )}
             </div>
-          ))}
-        </div>
 
-        {allItemsHandled && (
-          <div className="text-center">
-            <button
-              onClick={nextRound}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold"
-            >
-              Next Round
-            </button>
+            <div className={styles.wasteReason}>
+              Reason: {item.wasteReason}
+            </div>
+
+            {!item.saved && !item.wasted && (
+              <div className={styles.actionButtons}>
+                <button
+                  onClick={() => handleFoodAction(item.id, 'save')}
+                  className={styles.saveButton}
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => handleFoodAction(item.id, 'waste')}
+                  className={styles.wasteButton}
+                >
+                  Waste
+                </button>
+              </div>
+            )}
+
+            {item.saved && (
+              <div className={styles.savedIndicator}>
+                ✓ Saved!
+              </div>
+            )}
+
+            {item.wasted && (
+              <div className={styles.wastedIndicator}>
+                ✗ Wasted
+              </div>
+            )}
           </div>
-        )}
+        ))}
+      </div>
 
-        <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 How to Play:</h3>
-          <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <div>
-              <strong>Save:</strong> Choose items that can still be used or repurposed
-            </div>
-            <div>
-              <strong>Waste:</strong> Choose items that are truly spoiled or unusable
-            </div>
-            <div>
-              <strong>Goal:</strong> Maximize saved food to reduce waste
-            </div>
-            <div>
-              <strong>Tip:</strong> Consider composting and creative cooking!
-            </div>
+      {allItemsHandled && (
+        <div className={styles.nextRoundSection}>
+          <button onClick={nextRound} className={styles.nextRoundButton}>
+            Next Round
+          </button>
+        </div>
+      )}
+
+      <div className={styles.howToPlay}>
+        <h3 className={styles.howToPlayTitle}>How to Play:</h3>
+        <div className={styles.instructions}>
+          <div className={styles.instruction}>
+            <strong>Save:</strong> Choose items that can still be used or repurposed
+          </div>
+          <div className={styles.instruction}>
+            <strong>Waste:</strong> Choose items that are truly spoiled or unusable
+          </div>
+          <div className={styles.instruction}>
+            <strong>Goal:</strong> Maximize saved food to reduce waste
+          </div>
+          <div className={styles.instruction}>
+            <strong>Tip:</strong> Consider composting and creative cooking!
           </div>
         </div>
       </div>
