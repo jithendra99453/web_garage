@@ -42,7 +42,7 @@ import Leaderboard from './components/LeaderBoard/LeaderBoard.jsx';
 
 function App() {
   return (
-    <UserProvider>
+    
     <Routes>
       {/* --- Public Routes --- */}
       <Route path="/" element={<LandingPage />} />
@@ -51,7 +51,11 @@ function App() {
       <Route path="/signup/school" element={<SchoolSignUp />} />
 
       {/* --- Protected Routes --- */}
-      <Route element={<ProtectedRoute />}>
+      <Route element={
+        <UserProvider>
+          <ProtectedRoute />
+        </UserProvider>
+      }>
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -87,7 +91,6 @@ function App() {
         {/* <Route path="/school-dashboard" element={<SchoolDashboard />} /> */}
       </Route>
     </Routes>
-    </UserProvider>
   );
 }
 

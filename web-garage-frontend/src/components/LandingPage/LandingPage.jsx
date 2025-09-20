@@ -10,7 +10,7 @@ const FeatureCard = ({ icon, title, description }) => (
     <p>{description}</p>
   </div>
 );
-
+console.log('landing page rendering');
 // Reusable Footer Component
 const Footer = () => (
     <footer className={styles.footer}>
