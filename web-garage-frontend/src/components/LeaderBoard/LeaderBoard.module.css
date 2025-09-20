@@ -1,0 +1,478 @@
+/* Leaderboard.module.css - Mobile-First Design */
+
+/* Container */
+.leaderboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Header Section */
+.header-section {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  color: white;
+  padding: 24px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" fill="none"><path d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1200,160,1248,128,1296,112L1344,96L1344,0L1296,0C1248,0,1152,0,1056,0C960,0,864,0,768,0C672,0,576,0,480,0C384,0,288,0,192,0C96,0,48,0,24,0L0,0Z" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat;
+  background-size: cover;
+  opacity: 0.3;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.header-icon {
+  color: #fef3c7;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.header-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-subtitle {
+  font-size: 16px;
+  margin: 4px 0 0 0;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.stats-section {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Filters Section */
+.filters-section {
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 20px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.filters-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  z-index: 2;
+}
+
+.search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 48px;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  background: #f9fafb;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #059669;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.filter-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 16px;
+  color: #6b7280;
+  z-index: 2;
+}
+
+.filter-select {
+  width: 100%;
+  height: 48px;
+  padding: 0 40px 0 48px;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  background: #f9fafb;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #059669;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.select-arrow {
+  position: absolute;
+  right: 16px;
+  color: #6b7280;
+  pointer-events: none;
+}
+
+/* Leaderboard Section */
+.leaderboard-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.leaderboard-list {
+  display: grid;
+  gap: 12px;
+}
+
+/* Student Cards */
+.student-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.student-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #059669, #10b981);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.student-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgba(5, 150, 105, 0.2);
+}
+
+.student-card:hover::before {
+  opacity: 1;
+}
+
+/* Rank Styles */
+.rank-first {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #f59e0b;
+}
+
+.rank-first::before {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  opacity: 1;
+}
+
+.rank-second {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  border-color: #9ca3af;
+}
+
+.rank-second::before {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  opacity: 1;
+}
+
+.rank-third {
+  background: linear-gradient(135deg, #fef7f0, #fed7aa);
+  border-color: #f97316;
+}
+
+.rank-third::before {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  opacity: 1;
+}
+
+.rank-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+}
+
+.rank-icon-gold {
+  color: #f59e0b;
+  filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+}
+
+.rank-icon-silver {
+  color: #6b7280;
+  filter: drop-shadow(0 2px 4px rgba(107, 114, 128, 0.3));
+}
+
+.rank-icon-bronze {
+  color: #f97316;
+  filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.3));
+}
+
+.rank-number {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+/* Student Info */
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #10b981);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);
+}
+
+.student-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.school-name,
+.class-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Points Section */
+.points-section {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.points-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #059669;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.points-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.no-results-icon {
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.no-results h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #374151;
+}
+
+.no-results p {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Responsive Design - Tablet */
+@media (min-width: 640px) {
+  .header-section {
+    padding: 32px 24px;
+  }
+  
+  .leaderboard-section {
+    padding: 32px 24px;
+  }
+  
+  .filters-section {
+    padding: 24px;
+  }
+  
+  .filters-container {
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+  }
+  
+  .search-container {
+    max-width: 400px;
+  }
+  
+  .filter-container {
+    min-width: 200px;
+  }
+  
+  .header-title {
+    font-size: 32px;
+  }
+  
+  .header-subtitle {
+    font-size: 18px;
+  }
+  
+  .student-meta {
+    flex-direction: row;
+    gap: 16px;
+  }
+  
+  .school-name,
+  .class-name {
+    font-size: 14px;
+  }
+  
+  .student-name {
+    font-size: 20px;
+  }
+}
+
+/* Responsive Design - Desktop */
+@media (min-width: 1024px) {
+  .header-section {
+    padding: 40px 32px;
+  }
+  
+  .leaderboard-section {
+    padding: 40px 32px;
+  }
+  
+  .filters-section {
+    padding: 32px;
+  }
+  
+  .student-card {
+    padding: 24px;
+  }
+  
+  .avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 18px;
+  }
+  
+  .points-value {
+    font-size: 28px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1280px) {
+  .leaderboard-list {
+    gap: 16px;
+  }
+  
+  .student-card {
+    padding: 28px;
+  }
+}

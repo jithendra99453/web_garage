@@ -38,6 +38,7 @@ import EcoRenewableEnergy from './components/EcoRenewableEnergy/EcoRenewableEner
 import EcoBiodiversityQuiz from './components/EcoBiodiversityQuiz/EcoBiodiversityQuiz.jsx';
 import EcoEcoFriendlyShopping from './components/EcoEcoFriendlyShopping/EcoEcoFriendlyShopping.jsx';
 import EcoSustainableLiving from './components/EcoSustainableLiving/EcoSustainableLiving.jsx';
+import Leaderboard from './components/LeaderBoard/LeaderBoard.jsx';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/student/leaderboard" element={<Leaderboard />}/>
         <Route path="/student/quiz" element={<QuizPage />} />
         <Route path="/student/puzzle" element={<EcoPuzzle />} />
         <Route path="/student/memory" element={<EcoMemoryGame />} />

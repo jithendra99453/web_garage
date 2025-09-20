@@ -281,10 +281,10 @@ const StudentDashboard = () => {
               <Target size={20} />
               <span>Complete Challenge</span>
             </button>
-            <button className={styles['action-btn-modern']}>
-              <Users size={20} />
-              <span>View Leaderboard</span>
-            </button>
+            <Link to="/student/leaderboard" className={styles['action-btn-modern']}>
+              <BookOpen size={20} />
+              <span>View LeaderBoard</span>
+            </Link>
           </div>
         </div>
 
