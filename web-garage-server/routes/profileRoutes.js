@@ -58,10 +58,52 @@ router.get('/', auth, async (req, res) => {
 // @route   PUT /api/profile
 // @desc    Update logged-in user's profile
 router.put('/', auth, async (req, res) => {
-    // This route also needs to be role-aware, but we can fix the GET route first.
-    // The logic will be similar to the GET route above.
-    // For now, let's focus on fixing the login loop.
-    res.status(501).json({ msg: 'Update not yet implemented for all roles.' });
+  try {
+    const { id, role } = req.user;
+    const { name, email, school, educationType, profilePicture } = req.body;
+
+    let updatedProfile;
+    let profileFields = {};
+
+    // Check which role is being updated
+    if (role === 'school' || role === 'teacher') {
+      // Build the fields object only for the school/teacher role
+      if (email) profileFields.email = email;
+      if (school) profileFields.school = school;
+      
+      updatedProfile = await School.findByIdAndUpdate(
+        id,
+        { $set: profileFields },
+        { new: true, runValidators: true } // 'new: true' returns the updated document
+      ).select('-password');
+
+    } else if (role === 'student') {
+      // Build the fields object only for the student role
+      if (name) profileFields.name = name;
+      if (email) profileFields.email = email;
+      if (school) profileFields.school = school;
+      if (educationType) profileFields.educationType = educationType;
+      if (profilePicture) profileFields.profilePicture = profilePicture;
+
+      updatedProfile = await Student.findByIdAndUpdate(
+        id,
+        { $set: profileFields },
+        { new: true, runValidators: true }
+      ).select('-password');
+    } else {
+        return res.status(400).json({ msg: 'Invalid user role.' });
+    }
+
+    if (!updatedProfile) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res.json(updatedProfile);
+
+  } catch (err) {
+    console.error('Error in PUT /api/profile:', err.message);
+    res.status(500).send('Server Error');
+  }
 });
 
 
