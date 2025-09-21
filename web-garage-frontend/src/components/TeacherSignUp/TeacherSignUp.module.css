@@ -81,8 +81,6 @@
 .formInput:focus, .formSelect:focus {
   outline: none;
   border-color: #16a34a;
-  ring: 2px;
-  ring-color: rgba(22, 163, 74, 0.1);
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 

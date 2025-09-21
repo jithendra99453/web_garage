@@ -46,10 +46,16 @@ const LandingPage = () => {
             </Link>
             {/* UPDATED LINK for schools/teachers */}
             <Link
+              to="/signup/teacher"
+              className={`${styles.btn} ${styles.btnSecondary}`}
+            >
+              Join as teacher
+            </Link>
+            <Link
               to="/signup/school"
               className={`${styles.btn} ${styles.btnSecondary}`}
             >
-              Onboard Your School
+              Register your School
             </Link>
           </div>
         </div>

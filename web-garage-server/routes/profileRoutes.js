@@ -2,88 +2,71 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/authMiddleware');
 const Student = require('../models/Student');
-const School = require('../models/School'); // <-- 1. IMPORT THE SCHOOL MODEL
+const Teacher = require('../models/Teacher'); // Correctly import the Teacher model
 
-
-console.log('--- profileRoutes.js file has been loaded and is being registered ---'); // <-- ADD THIS
-
-// --- ADD THIS UNPROTECTED TEST ROUTE ---
+// --- Test Route (Good for debugging) ---
 router.get('/test', (req, res) => {
   console.log('>>> SUCCESS: /api/profile/test route was hit!');
   res.send('Profile test route is working!');
 });
 
-
-
 // @route   GET /api/profile
+// @desc    Get profile for logged-in user (student or teacher)
 router.get('/', auth, async (req, res) => {
-  console.log('>>> Step 1: Entered /api/profile route handler.'); // New Log
-
   try {
     const { id, role } = req.user;
-    console.log(`>>> Step 2: User ID is "${id}", Role is "${role}".`); // New Log
-
     let userProfile;
 
-    if (role === 'school' || role === 'teacher') { // Check for both 'school' and 'teacher' just in case
-      console.log('>>> Step 3: Searching in School collection...'); // New Log
-      userProfile = await School.findById(id).select('-password');
-      console.log('>>> Step 4: School.findById result:', userProfile); // New Log
-
+    if (role === 'teacher') {
+      userProfile = await Teacher.findById(id).select('-password');
     } else if (role === 'student') {
-      console.log('>>> Step 3: Searching in Student collection...'); // New Log
       userProfile = await Student.findById(id).select('-password');
-      console.log('>>> Step 4: Student.findById result:', userProfile); // New Log
-
     } else {
-      console.log(`>>> ERROR: Role is invalid: "${role}"`); // New Log
       return res.status(400).json({ msg: 'Invalid user role in token' });
     }
 
     if (!userProfile) {
-      console.log('>>> ERROR: User profile was not found in the database.'); // New Log
       return res.status(404).json({ msg: 'User not found in database' });
     }
 
-    console.log('>>> SUCCESS: User profile found. Sending response.'); // New Log
     res.json(userProfile);
 
   } catch (err) {
-    console.error('>>> CATCH BLOCK ERROR in /api/profile:', err); // New Log
+    console.error('Error in GET /api/profile:', err.message);
     res.status(500).send('Server Error');
   }
 });
-
 
 // @route   PUT /api/profile
 // @desc    Update logged-in user's profile
 router.put('/', auth, async (req, res) => {
   try {
     const { id, role } = req.user;
-    const { name, email, school, educationType, profilePicture } = req.body;
-
+    const body = req.body;
     let updatedProfile;
-    let profileFields = {};
 
-    // Check which role is being updated
-    if (role === 'school' || role === 'teacher') {
-      // Build the fields object only for the school/teacher role
-      if (email) profileFields.email = email;
-      if (school) profileFields.school = school;
+    if (role === 'teacher') {
+      // Build the fields object for the teacher role
+      const profileFields = {};
+      if (body.name) profileFields.name = body.name;
+      if (body.email) profileFields.email = body.email;
+      if (body.schoolName) profileFields.schoolName = body.schoolName;
+      if (body.subject) profileFields.subject = body.subject;
       
-      updatedProfile = await School.findByIdAndUpdate(
+      updatedProfile = await Teacher.findByIdAndUpdate(
         id,
         { $set: profileFields },
-        { new: true, runValidators: true } // 'new: true' returns the updated document
+        { new: true, runValidators: true }
       ).select('-password');
 
     } else if (role === 'student') {
-      // Build the fields object only for the student role
-      if (name) profileFields.name = name;
-      if (email) profileFields.email = email;
-      if (school) profileFields.school = school;
-      if (educationType) profileFields.educationType = educationType;
-      if (profilePicture) profileFields.profilePicture = profilePicture;
+      // Build the fields object for the student role
+      const profileFields = {};
+      if (body.name) profileFields.name = body.name;
+      if (body.email) profileFields.email = body.email;
+      if (body.school) profileFields.school = body.school;
+      if (body.educationType) profileFields.educationType = body.educationType;
+      if (body.profilePicture) profileFields.profilePicture = body.profilePicture;
 
       updatedProfile = await Student.findByIdAndUpdate(
         id,
@@ -91,7 +74,7 @@ router.put('/', auth, async (req, res) => {
         { new: true, runValidators: true }
       ).select('-password');
     } else {
-        return res.status(400).json({ msg: 'Invalid user role.' });
+      return res.status(400).json({ msg: 'Invalid user role.' });
     }
 
     if (!updatedProfile) {
@@ -106,31 +89,32 @@ router.put('/', auth, async (req, res) => {
   }
 });
 
-
-// --- ADD THIS NEW ROUTE ---
 // @route   PATCH /api/profile/points
-// @desc    Add points to a user's total
+// @desc    Add points to a student's total (only applicable to students)
 router.patch('/points', auth, async (req, res) => {
   const { points } = req.body;
+  const { role, id } = req.user;
 
-  // Basic validation
+  // This route should only be for students
+  if (role !== 'student') {
+    return res.status(403).json({ msg: 'Forbidden: Only students can have points updated.' });
+  }
+  
   if (typeof points !== 'number' || points <= 0) {
     return res.status(400).json({ msg: 'Invalid points value.' });
   }
 
   try {
-    // Use MongoDB's $inc operator to atomically increment the points
     const student = await Student.findByIdAndUpdate(
-      req.user.id,
+      id,
       { $inc: { totalPoints: points } },
-      { new: true } // This option returns the updated document
+      { new: true }
     ).select('totalPoints');
 
     if (!student) {
-      return res.status(404).json({ msg: 'User not found.' });
+      return res.status(404).json({ msg: 'Student not found.' });
     }
 
-    // Send back the new total
     res.json({ totalPoints: student.totalPoints });
 
   } catch (err) {

@@ -1,33 +1,30 @@
-// web-garage-server/middleware/authMiddleware.js
-
 const jwt = require('jsonwebtoken');
 
-// A function to act as our middleware
 const authMiddleware = (req, res, next) => {
-  // 1. Get token from the request header
-  const token = req.header('x-auth-token');
+  // 1. Get the token from the 'Authorization' header
+  const authHeader = req.header('Authorization');
 
-  // 2. Check if a token exists
-  if (!token) {
-    // If no token, send a 401 Unauthorized response
+  // 2. Check if the token exists and is in the correct format ('Bearer <token>')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ msg: 'No token, authorization denied' });
   }
 
   try {
-    // 3. If there is a token, verify it
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // This is the log we added for debugging.
-    // If it runs, we know the token is valid.
-    console.log('DECODED TOKEN IN MIDDLEWARE:', decoded);
+    // 3. Extract the token from the header
+    const token = authHeader.split(' ')[1];
 
-    // 4. Attach the decoded user payload to the request object
+    // 4. Verify the token using your JWT_SECRET from .env
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 5. Attach the decoded user payload to the request object
+    // This makes req.user available in your protected routes
     req.user = decoded.user;
     
-    // 5. Call next() to pass control to the next middleware function (or the route handler)
+    // 6. Pass control to the next middleware or the route handler
     next();
   } catch (err) {
-    // If verification fails (invalid token), send a 401 response
+    // 7. If the token is invalid (expired, malformed, etc.), send a 401 response
+    console.error('Token verification failed:', err.message);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };

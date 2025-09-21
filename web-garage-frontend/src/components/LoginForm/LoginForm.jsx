@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import styles from './LoginForm.module.css'; // Renamed to match folder
+import styles from './LoginForm.module.css';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -14,33 +14,35 @@ const LoginForm = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  // Correctly updated URL with the '/auth' prefix
-  const loginUrl = role === 'student' 
-    ? 'http://localhost:5000/api/auth/login/student' 
-    : 'http://localhost:5000/api/auth/login/school';
-  
-  try {
-    const response = await axios.post(loginUrl, formData);
+    e.preventDefault();
     
-    // --- Store the JWT in local storage ---
-    localStorage.setItem('token', response.data.token);
+    // --- UPDATED LOGIC ---
+    // Use relative paths that will work with your Vite proxy.
+    // The endpoint for teacher login is now /login/teacher.
+    const loginUrl = role === 'student' 
+      ? '/api/auth/login/student' 
+      : '/api/auth/login/teacher'; // Corrected from /login/school
     
-    alert('Login successful!');
-    
-    // Redirect to the appropriate dashboard
-    navigate(role === 'student' ? '/student-dashboard' : '/teacher-dashboard');
+    try {
+      const response = await axios.post(loginUrl, formData);
+      
+      localStorage.setItem('token', response.data.token);
+      alert('Login successful!');
+      
+      // Redirect to the appropriate dashboard
+      navigate(role === 'student' ? '/student-dashboard' : '/teacher-dashboard');
 
-  } catch (error) {
-    console.error('Login failed:', error.response?.data.message || error.message);
-    alert('Login failed: ' + (error.response?.data.message || 'Please check your credentials.'));
-  }
-};
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Please check your credentials.';
+      console.error('Login failed:', errorMessage);
+      alert('Login failed: ' + errorMessage);
+    }
+  };
 
-
-  // This function redirects the user to the correct sign-up page
   const handleSignUpRedirect = () => {
-    const signUpPath = role === 'teacher' ? '/signup/school' : '/signup/student';
+    // --- UPDATED LOGIC ---
+    // Redirect to the new teacher signup route
+    const signUpPath = role === 'teacher' ? '/signup/teacher' : '/signup/student';
     navigate(signUpPath);
   };
 
@@ -50,7 +52,6 @@ const LoginForm = () => {
         <h2 className={styles.title}>Log In</h2>
         <p className={styles.subtitle}>Welcome back to EcoQuest</p>
         
-        {/* Login Form */}
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
             <label className={styles.formLabel} htmlFor="email">Email Address</label>
@@ -63,14 +64,12 @@ const LoginForm = () => {
           <button type="submit" className={styles.submitButton}>Log In</button>
         </form>
 
-        {/* Separator */}
         <div className={styles.separator}>
           <span>OR</span>
         </div>
 
-        {/* Button to redirect to the correct Sign-Up page */}
         <button
-          type="button" // Important: prevents form submission
+          type="button"
           className={styles.secondaryButton}
           onClick={handleSignUpRedirect}
         >

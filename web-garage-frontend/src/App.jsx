@@ -5,9 +5,9 @@ import { UserProvider } from './context/UserContext.jsx';
 // Import your components
 import ProfilePage from './components/Profile/Profile.jsx'; // 1. Import the new Profile component
 import LandingPage from './components/LandingPage/LandingPage.jsx';
-import LoginForm from './components/LoginForm/LoginForm.jsx';
+import SchoolModule from './components/SchoolModule/SchoolModule.jsx';
 import StudentSignUp from './components/StudentSignUp/StudentSignUp.jsx';
-import SchoolSignUp from './components/SchoolSignUp/SchoolSignUp.jsx';
+import LoginForm from './components/LoginForm/LoginForm.jsx';
 import StudentDashboard from './components/StudentDashboard/StudentDashboard.jsx'; // Your new dashboard
 import TeacherDashboard from './components/TeacherDashboard/TeacherDashboard.jsx'; // Example for another dashboard
 import ProtectedRoute from './components/ProtectedRoute.jsx'; // The guard
@@ -40,6 +40,7 @@ import EcoEcoFriendlyShopping from './components/EcoEcoFriendlyShopping/EcoEcoFr
 import EcoSustainableLiving from './components/EcoSustainableLiving/EcoSustainableLiving.jsx';
 import Leaderboard from './components/LeaderBoard/LeaderBoard.jsx';
 import Chatbot from './components/ChatBot/ChatBot.jsx';
+import TeacherSignUp from './components/TeacherSignUp/TeacherSignUp.jsx';
 
 function App() {
   return (
@@ -49,7 +50,8 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/signup/student" element={<StudentSignUp />} />
-      <Route path="/signup/school" element={<SchoolSignUp />} />
+      <Route path="/signup/teacher" element={<TeacherSignUp />} />
+      <Route path="/signup/school" element={<SchoolModule />} />
 
       {/* --- Protected Routes --- */}
       <Route element={

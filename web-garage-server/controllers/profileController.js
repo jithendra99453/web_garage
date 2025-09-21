@@ -1,26 +1,24 @@
 // web-garage-server/controllers/profileController.js
 
 const Student = require('../models/Student');
-const School = require('../models/School'); // Make sure to require the School model
+const Teacher = require('../models/Teacher'); // CORRECT: Import Teacher model
 
-// @desc    Get logged-in user's profile (for either Student or School)
+// @desc    Get logged-in user's profile
 // @route   GET /api/profile
 // @access  Private
 exports.getProfile = async (req, res) => {
   try {
-    // req.user is attached by your auth middleware and should contain id and role
     const { id, role } = req.user;
-
     let userProfile;
 
-    // Check the user's role and query the correct collection
-    if (role === 'school') {
-      userProfile = await School.findById(id).select('-password');
+    // CORRECT: Check for the 'teacher' role
+    if (role === 'teacher') {
+      // CORRECT: Use the Teacher model
+      userProfile = await Teacher.findById(id).select('-password');
     } else if (role === 'student') {
       userProfile = await Student.findById(id).select('-password');
     }
 
-    // If no profile is found for the given role and ID
     if (!userProfile) {
       return res.status(404).json({ msg: 'User not found' });
     }
@@ -40,21 +38,22 @@ exports.updateProfile = async (req, res) => {
     const { id, role } = req.user;
     let updatedProfile;
 
-    if (role === 'school') {
-      // Logic to update school profile
-      const { school, email } = req.body;
+    // CORRECT: Check for 'teacher' role
+    if (role === 'teacher') {
+      const { name, email, schoolName, subject } = req.body;
       const profileFields = {};
-      if (school) profileFields.school = school;
+      if (name) profileFields.name = name;
       if (email) profileFields.email = email;
+      if (schoolName) profileFields.schoolName = schoolName; // Use schoolName if that's the field
+      if (subject) profileFields.subject = subject;
       
-      updatedProfile = await School.findByIdAndUpdate(
+      updatedProfile = await Teacher.findByIdAndUpdate(
         id,
         { $set: profileFields },
-        { new: true }
+        { new: true, runValidators: true } // Added runValidators
       ).select('-password');
 
     } else if (role === 'student') {
-      // Your existing logic to update student profile
       const { name, email, school, educationType, profilePicture } = req.body;
       const profileFields = {};
       if (name) profileFields.name = name;
@@ -66,7 +65,7 @@ exports.updateProfile = async (req, res) => {
       updatedProfile = await Student.findByIdAndUpdate(
         id,
         { $set: profileFields },
-        { new: true }
+        { new: true, runValidators: true } // Added runValidators
       ).select('-password');
     }
 
@@ -75,7 +74,6 @@ exports.updateProfile = async (req, res) => {
     }
 
     res.json(updatedProfile);
-
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

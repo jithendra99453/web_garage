@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styles from './SchoolSignUp.module.css';
+import styles from './TeacherSignUp.module.css'; // You can rename this CSS file if you like
 
-const SchoolSignUp = () => {
+const TeacherSignUp = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     school: '',
@@ -20,25 +21,27 @@ const SchoolSignUp = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register/school', formData);
+      const response = await axios.post('http://localhost:5000/api/auth/register/teacher', formData);
 
-      console.log('Server response:', response.data.message);
-      alert('School account created successfully!');
-
+      alert(response.data.message);
       navigate('/login?role=teacher');
-
     } catch (error) {
-      console.error('Registration failed:', error.response ? error.response.data.message : error.message);
-      alert('Registration failed: ' + (error.response ? error.response.data.message : 'Please try again later.'));
+      const errorMessage = error.response ? error.response.data.message : 'An unknown error occurred.';
+      console.error('Registration failed:', errorMessage);
+      alert('Registration failed: ' + errorMessage);
     }
   };
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.formContainer}>
-        <h2 className={styles.title}>Teacher / School Sign Up</h2>
+        <h2 className={styles.title}>Teacher Sign Up</h2>
         <p className={styles.subtitle}>Create your EcoQuest Teacher Account</p>
         <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="name">Full Name</label>
+            <input type="text" id="name" name="name" className={styles.formInput} value={formData.name} onChange={handleInputChange} required />
+          </div>
           <div className={styles.formGroup}>
             <label className={styles.formLabel} htmlFor="email">Email Address</label>
             <input type="email" id="email" name="email" className={styles.formInput} value={formData.email} onChange={handleInputChange} required />
@@ -61,4 +64,4 @@ const SchoolSignUp = () => {
   );
 };
 
-export default SchoolSignUp;
+export default TeacherSignUp;
