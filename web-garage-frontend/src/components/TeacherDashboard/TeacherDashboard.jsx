@@ -195,7 +195,7 @@ const handleCreateTask = async (taskData) => {
   };
 
   const openLeaderboard = () => {
-    navigate('/leaderboard');
+    navigate('/student/leaderboard');
   };
 
   const pendingSubmissions = selectedClass?.submissions.filter(s => s.status === 'pending') || [];
