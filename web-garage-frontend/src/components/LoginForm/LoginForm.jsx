@@ -14,25 +14,29 @@ const LoginForm = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const loginUrl = role === 'student' ? 'http://localhost:5000/api/login/student' : 'http://localhost:5000/api/login/school';
+  e.preventDefault();
+  // Correctly updated URL with the '/auth' prefix
+  const loginUrl = role === 'student' 
+    ? 'http://localhost:5000/api/auth/login/student' 
+    : 'http://localhost:5000/api/auth/login/school';
+  
+  try {
+    const response = await axios.post(loginUrl, formData);
     
-    try {
-      const response = await axios.post(loginUrl, formData);
+    // --- Store the JWT in local storage ---
+    localStorage.setItem('token', response.data.token);
+    
+    alert('Login successful!');
+    
+    // Redirect to the appropriate dashboard
+    navigate(role === 'student' ? '/student-dashboard' : '/teacher-dashboard');
 
-      // --- Store the JWT in local storage ---
-      localStorage.setItem('token', response.data.token);
-      
-      alert('Login successful!');
-      
-      // Redirect to the appropriate dashboard
-      navigate(role === 'student' ? '/student-dashboard' : '/teacher-dashboard');
+  } catch (error) {
+    console.error('Login failed:', error.response?.data.message || error.message);
+    alert('Login failed: ' + (error.response?.data.message || 'Please check your credentials.'));
+  }
+};
 
-    } catch (error) {
-      console.error('Login failed:', error.response?.data.message || error.message);
-      alert('Login failed: ' + (error.response?.data.message || 'Please check your credentials.'));
-    }
-  };
 
   // This function redirects the user to the correct sign-up page
   const handleSignUpRedirect = () => {

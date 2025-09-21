@@ -39,12 +39,13 @@ import EcoBiodiversityQuiz from './components/EcoBiodiversityQuiz/EcoBiodiversit
 import EcoEcoFriendlyShopping from './components/EcoEcoFriendlyShopping/EcoEcoFriendlyShopping.jsx';
 import EcoSustainableLiving from './components/EcoSustainableLiving/EcoSustainableLiving.jsx';
 import Leaderboard from './components/LeaderBoard/LeaderBoard.jsx';
+import Chatbot from './components/ChatBot/ChatBot.jsx';
 
 function App() {
   return (
     
     <Routes>
-      {/* --- Public Routes --- */}
+      {/* --- Public Routes ---*/}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/signup/student" element={<StudentSignUp />} />

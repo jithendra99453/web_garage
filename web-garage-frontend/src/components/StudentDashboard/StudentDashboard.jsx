@@ -3,11 +3,11 @@ import {
   Trophy, Zap, BookOpen, Users, Award, Leaf, Recycle, Calendar, 
   ExternalLink, CheckCircle, Lock, Target, TrendingDown, Home, 
   User, Settings, LogOut, Bell, Menu, X, Puzzle, Brain, 
-  HelpCircle, Search, Trash2, Sun
+  HelpCircle, Search, Trash2, Sun,MessageCircle, Send, Minimize2 
 } from 'lucide-react';
 import styles from './StudentDashboard.module.css';
 import { Link } from 'react-router-dom';
-
+import ChatBot from '../../components/ChatBot/ChatBot.jsx';
 // 1. Import the context
 import UserContext from '../../context/UserContext.jsx'; 
 
@@ -395,13 +395,14 @@ const StudentDashboard = () => {
                 <div className={styles['goal-progress']}>
                   <div className={styles['goal-fill']} style={{ width: '73%' }}></div>
                 </div>
-                <span className={styles['impact-value']}>73%</span>
+                <span className={styles['impact-value']}>0%</span>
                 <p className={styles['impact-description']}>Keep going! You're doing great this week.</p>
               </div>
             </div>
           </div>
         </div>
       </main>
+      <ChatBot />
     </div>
   );
 };
