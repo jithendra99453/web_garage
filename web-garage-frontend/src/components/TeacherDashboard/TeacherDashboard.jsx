@@ -50,98 +50,40 @@ const dummyTeacher = {
   bio: "Passionate educator dedicated to environmental awareness and sustainable living. I believe in hands-on learning and practical application of environmental concepts."
 };
 
+// In TeacherDashboard.jsx
+
+// --- Example updated dummy data ---
 const dummyClasses = [
   {
-    id: 1,
+    id: "63f8b9e3a3b4c2d5e4f6a7b8", // <-- Use a real ObjectId string
     name: "Class 10A",
     ecoPoints: 850,
     badges: ["Tree Planter", "Water Saver", "Recycling Hero"],
-    tasks: [
-      {
-        id: 1,
-        title: "Plant 5 Trees",
-        description: "Plant 5 trees in your neighborhood and upload photos with location",
-        dueDate: "2025-10-15",
-        active: true,
-        points: 100
-      },
-      {
-        id: 2,
-        title: "Water Conservation",
-        description: "Track and reduce water usage for a week",
-        dueDate: "2025-10-10",
-        active: true,
-        points: 75
-      }
-    ],
+    tasks: [], // Start with empty tasks, they will be fetched from DB
     students: [
-      { id: 1, name: "Amit Kumar" },
-      { id: 2, name: "Priya Sharma" },
-      { id: 3, name: "Sneha Patel" },
-      { id: 4, name: "Rahul Singh" },
-      { id: 5, name: "Neha Gupta" }
+      { id: "63f8b9fba3b4c2d5e4f6a7b9", name: "Amit Kumar" },
+      { id: "63f8ba0da3b4c2d5e4f6a7ba", name: "Priya Sharma" },
+      { id: "63f8ba1aa3b4c2d5e4f6a7bb", name: "Sneha Patel" },
+      { id: "63f8ba25a3b4c2d5e4f6a7bc", name: "Rahul Singh" },
+      { id: "63f8ba30a3b4c2d5e4f6a7bd", name: "Neha Gupta" }
     ],
-    submissions: [
-      {
-        id: 101,
-        taskId: 1,
-        studentId: 1,
-        studentName: "Amit Kumar",
-        content: "I planted 5 mango trees near my home. Here are the photos with GPS coordinates.",
-        imageUrl: "tree-planting-photo.jpg",
-        status: "pending",
-        submittedDate: "2025-09-20",
-        score: null,
-        feedback: ""
-      },
-      {
-        id: 102,
-        taskId: 1,
-        studentId: 2,
-        studentName: "Priya Sharma",
-        content: "Planted 5 neem trees in the school garden with my friends.",
-        imageUrl: "school-garden.jpg",
-        status: "reviewed",
-        submittedDate: "2025-09-18",
-        score: 95,
-        feedback: "Excellent work! Great choice of trees."
-      },
-      {
-        id: 103,
-        taskId: 2,
-        studentId: 3,
-        studentName: "Sneha Patel",
-        content: "Water usage reduced by 30% this week by fixing leaks and shorter showers.",
-        status: "pending",
-        submittedDate: "2025-09-19",
-        score: null,
-        feedback: ""
-      }
-    ]
+    submissions: []
   },
   {
-    id: 2,
+    id: "63f8ba3fa3b4c2d5e4f6a7be", // <-- Use a real ObjectId string
     name: "Class 10B",
     ecoPoints: 720,
     badges: ["Eco Warrior", "Green Champion"],
-    tasks: [
-      {
-        id: 3,
-        title: "Waste Segregation",
-        description: "Create a waste segregation system at home",
-        dueDate: "2025-10-20",
-        active: true,
-        points: 80
-      }
-    ],
+    tasks: [],
     students: [
-      { id: 6, name: "Vikram Joshi" },
-      { id: 7, name: "Ananya Roy" },
-      { id: 8, name: "Arjun Mehta" }
+      { id: "63f8ba51a3b4c2d5e4f6a7bf", name: "Vikram Joshi" },
+      { id: "63f8ba5ca3b4c2d5e4f6a7c0", name: "Ananya Roy" },
+      { id: "63f8ba67a3b4c2d5e4f6a7c1", name: "Arjun Mehta" }
     ],
     submissions: []
   }
 ];
+
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
@@ -170,27 +112,61 @@ const TeacherDashboard = () => {
     setSelectedClass(newClass);
   };
 
-  const handleCreateTask = (taskData) => {
-    const newTask = {
-      id: Date.now(),
-      ...taskData,
-      active: true
-    };
+// TeacherDashboard.jsx
 
+// ... other imports and component setup
+
+const handleCreateTask = async (taskData) => {
+  // Get the ID of the currently selected class
+  const classId = selectedClass.id; 
+
+  // Combine taskData from the form with the classId
+  const newTaskPayload = {
+    ...taskData,
+    classId: classId,
+  };
+
+  try {
+    const response = await fetch('/api/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Include your authentication token if required
+        // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(newTaskPayload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create task');
+    }
+
+    const savedTask = await response.json();
+
+    // Now, update the local state with the data confirmed by the database
     const updatedClasses = classes.map(c => {
-      if (c.id === selectedClass.id) {
+      if (c.id === classId) {
         return {
           ...c,
-          tasks: [...c.tasks, newTask]
+          tasks: [...c.tasks, savedTask],
         };
       }
       return c;
     });
 
     setClasses(updatedClasses);
-    setSelectedClass(updatedClasses.find(c => c.id === selectedClass.id));
+    setSelectedClass(updatedClasses.find(c => c.id === classId));
     setShowTaskForm(false);
-  };
+    alert('Task created successfully!');
+
+  } catch (error) {
+    console.error('Error creating task:', error);
+    alert('An error occurred. Please try again.');
+  }
+};
+
+// ... rest of your component
+
 
   const handleUpdateTeacher = (updatedTeacher) => {
     setTeacher(updatedTeacher);
@@ -433,8 +409,10 @@ const TeacherDashboard = () => {
         <TaskForm
           onSubmit={handleCreateTask}
           onClose={() => setShowTaskForm(false)}
+          students={selectedClass.students}
         />
       )}
+
 
       {modalSubmission && (
         <SubmissionModal

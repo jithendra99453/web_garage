@@ -74,6 +74,51 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
+/* --- Add these styles to TaskForm.module.css --- */
+
+.studentSelectorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.selectAllBtn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 4px;
+}
+
+.studentList {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.studentCheckbox {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.studentCheckbox input {
+  margin-right: 10px;
+  height: 16px;
+  width: 16px;
+}
+
+.studentCheckbox:last-child {
+  margin-bottom: 0;
+}
+
 
 .label {
   display: block;

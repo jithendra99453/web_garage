@@ -57,6 +57,30 @@ const StudentDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [studyTaskCompleted, setStudyTaskCompleted] = useState(false);
   
+  const [assignedTasks, setAssignedTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  useEffect(() => {
+    if (studentData?._id) { // Only fetch if we have the student's ID
+      const fetchTasks = async () => {
+        setTasksLoading(true);
+        try {
+          const response = await fetch(`/api/tasks/student/${studentData._id}`);
+          if (!response.ok) {
+            throw new Error('Could not fetch tasks.');
+          }
+          const data = await response.json();
+          setAssignedTasks(data);
+        } catch (error) {
+          console.error("Error fetching tasks:", error);
+          // Optionally set an error state to show in the UI
+        } finally {
+          setTasksLoading(false);
+        }
+      };
+
+      fetchTasks();
+    }
+  }, [studentData]);
   // 3. Use `useMemo` to efficiently filter games only when studentData changes
   const availableGames = useMemo(() => {
     if (!studentData?.educationType) return [];
@@ -340,16 +364,23 @@ const StudentDashboard = () => {
               <Lock className={styles['lock-icon']} />
               <p className={styles['locked-text']}>Complete your study task to unlock challenges!</p>
             </div>
+          ) : tasksLoading ? (
+            <p>Loading your tasks...</p> // Loading indicator
+          ) : assignedTasks.length === 0 ? (
+            <p>No tasks have been assigned by your teacher yet.</p> // Empty state
           ) : (
             <div className={styles['tasks-grid']}>
-              {upcomingTasks.map((task) => (
-                <div key={task.id} className={styles['task-card']}>
+              {assignedTasks.map((task) => (
+                <div key={task._id} className={styles['task-card']}>
                   <h4 className={styles['task-title']}>{task.title}</h4>
                   <p className={styles['task-description']}>{task.description}</p>
                   <div className={styles['task-footer']}>
-                    <span className={styles['task-deadline']}>{task.deadline}</span>
+                    <span className={styles['task-deadline']}>
+                      Due: {new Date(task.dueDate).toLocaleDateString()}
+                    </span>
                     <span className={styles['task-points']}>+{task.points} pts</span>
                   </div>
+                  {/* You can add a 'Submit Task' button here later */}
                 </div>
               ))}
             </div>
