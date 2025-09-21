@@ -41,7 +41,7 @@ const StudentSignUp = () => {
 
     try {
       // Send the form data to the backend
-      const response = await axios.post('http://localhost:5000/api/register/student', formData);
+      const response = await axios.post('http://localhost:5000/api/auth/register/student', formData);
 
       console.log('Server response:', response.data.message);
       alert('Student account created successfully!');

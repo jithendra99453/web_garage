@@ -20,7 +20,7 @@ const SchoolSignUp = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/register/school', formData);
+      const response = await axios.post('http://localhost:5000/api/auth/register/school', formData);
 
       console.log('Server response:', response.data.message);
       alert('School account created successfully!');
