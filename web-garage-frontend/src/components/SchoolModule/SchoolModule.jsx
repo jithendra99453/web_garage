@@ -908,6 +908,7 @@ const DashboardContent = ({ schoolName, stats, teachers, leaderboard }) => {
 
 // School Sign Up Component
 const SchoolSignUp = ({ onSuccess }) => {
+  // 1. Initialize state with ALL required fields for registration.
   const [formData, setFormData] = useState({
     schoolName: '',
     address: '',
@@ -915,148 +916,71 @@ const SchoolSignUp = ({ onSuccess }) => {
     password: '',
     confirmPassword: ''
   });
+  
   const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // 2. A single, robust handleChange function to update state.
   const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
+    setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors({ ...errors, [field]: '' });
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.schoolName.trim()) {
-      newErrors.schoolName = 'School name is required';
-    }
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required';
-    }
-    if (!formData.adminEmail.trim()) {
-      newErrors.adminEmail = 'Admin email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.adminEmail)) {
-      newErrors.adminEmail = 'Invalid email format';
-    }
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
+    if (!formData.schoolName) newErrors.schoolName = 'School name is required.';
+    if (!formData.address) newErrors.address = 'Address is required.';
+    if (!formData.adminEmail) newErrors.adminEmail = 'Admin email is required.';
+    if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters.';
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match.';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // 3. The corrected handleSubmit function.
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      try {
-        // 1. Make the login request
-        const response = await axios.post('http://localhost:5000/api/auth/login/school', formData);
-        console.log('Server Login Response:', response.data); 
-        // 2. Check if the response and the token actually exist
-        if (response.data && response.data.token) {
-          // 3. Save the token and school name to localStorage
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('schoolName', response.data.schoolName);
-          
-          alert('Login successful!');
-          
-          // 4. Only navigate AFTER the token has been saved
-          onSuccess('dashboard', response.data.schoolName);
-        } else {
-          // This handles cases where the server responds with success but no token
-          alert('Login failed: No token received from server.');
-        }
+        try {
+            // --- THE FIX IS HERE ---
+            // Create a payload that excludes 'confirmPassword'
+            const payload = {
+                schoolName: formData.schoolName,
+                address: formData.address,
+                adminEmail: formData.adminEmail,
+                password: formData.password,
+            };
 
-      } catch (error) {
-        const errorMessage = error.response ? error.response.data.message : 'An unknown error occurred.';
-        console.error('Login failed:', error);
-        alert(`Login failed: ${errorMessage}`);
-      }
+            // Post the COMPLETE payload to the CORRECT /register/school endpoint.
+            const response = await axios.post('http://localhost:5000/api/auth/register/school', payload);
+            
+            alert('School registration successful! Please log in.');
+            onSuccess('login'); // Switch to the login view
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'An unknown registration error occurred.';
+            console.error('Registration failed:', error);
+            alert(`Registration failed: ${errorMessage}`);
+        }
     }
   };
+
+  // 4. Ensure all your input fields are correctly linked.
   return (
-    <div style={styles.formContainer}>
-      <div style={styles.formCard}>
+    <div style={styles.formCard}>
         <div style={styles.formHeader}>
-          <h2 style={styles.formTitle}>School Registration</h2>
-          <p style={styles.formSubtitle}>Join our Environmental Education Platform</p>
+            <h1 style={styles.formTitle}>Register Your School</h1>
+            <p style={styles.formSubtitle}>Create an admin account to manage teachers and students.</p>
         </div>
-
-        <form onSubmit={handleSubmit}>
-          <Input
-            placeholder="School Name"
-            value={formData.schoolName}
-            onChange={(e) => handleChange('schoolName', e.target.value)}
-            icon={School}
-            error={errors.schoolName}
-          />
-
-          <Input
-            placeholder="School Address"
-            value={formData.address}
-            onChange={(e) => handleChange('address', e.target.value)}
-            icon={MapPin}
-            error={errors.address}
-          />
-
-          <Input
-            type="email"
-            placeholder="Admin Email"
-            value={formData.adminEmail}
-            onChange={(e) => handleChange('adminEmail', e.target.value)}
-            icon={Mail}
-            error={errors.adminEmail}
-          />
-
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) => handleChange('password', e.target.value)}
-            icon={Lock}
-            error={errors.password}
-            showPasswordToggle={true}
-            onTogglePassword={() => setShowPassword(!showPassword)}
-          />
-
-          <Input
-            type={showConfirmPassword ? 'text' : 'password'}
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={(e) => handleChange('confirmPassword', e.target.value)}
-            icon={Lock}
-            error={errors.confirmPassword}
-            showPasswordToggle={true}
-            onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
-          />
-
-          <Button type="submit">
-            Create School Account
-          </Button>
+        <form onSubmit={handleSubmit} noValidate>
+            <Input name="schoolName" placeholder="School Name" value={formData.schoolName} onChange={(e) => handleChange('schoolName', e.target.value)} error={errors.schoolName} icon={School} />
+            <Input name="address" placeholder="School Address" value={formData.address} onChange={(e) => handleChange('address', e.target.value)} error={errors.address} icon={MapPin} />
+            <Input name="adminEmail" type="email" placeholder="Administrator Email" value={formData.adminEmail} onChange={(e) => handleChange('adminEmail', e.target.value)} error={errors.adminEmail} icon={Mail} />
+            <Input name="password" type="password" placeholder="Password" value={formData.password} onChange={(e) => handleChange('password', e.target.value)} error={errors.password} icon={Lock} />
+            <Input name="confirmPassword" type="password" placeholder="Confirm Password" value={formData.confirmPassword} onChange={(e) => handleChange('confirmPassword', e.target.value)} error={errors.confirmPassword} icon={Lock} />
+            <Button type="submit">Create Account</Button>
         </form>
-
-        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          <span style={{ color: '#6b7280' }}>Already have an account? </span>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              onSuccess('login');
-            }}
-            style={styles.link}
-          >
-            Sign In
-          </a>
-        </div>
-      </div>
     </div>
   );
 };
@@ -1097,8 +1021,12 @@ const SchoolLogin = ({ onSuccess, onSignUp }) => {
     e.preventDefault();
     if (validateForm()) {
       try {
+         const payload = {
+                adminEmail: formData.adminEmail, // Ensure this matches your state name
+                password: formData.password
+          };
         // 1. Make the actual login request to the backend
-        const response = await axios.post('http://localhost:5000/api/auth/login/school', formData);
+        const response = await axios.post('http://localhost:5000/api/auth/login/school', payload);
         
         console.log('Server Login Response:', response.data); // You will now see this in the console
 
@@ -1192,39 +1120,47 @@ const SchoolDashboard = ({ onLogout, schoolName }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+// Inside the SchoolDashboard component in SchoolModule.jsx
+
 useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError('');
       try {
         // 1. Get the token from localStorage
         const token = localStorage.getItem('token');
 
-        // 2. If no token is found, don't even try to fetch
         if (!token) {
           setError('No authentication token found. Please log in.');
           setLoading(false);
           return;
         }
 
-        // 3. Make the API call WITH the Authorization header
-        const response = await axios.get('http://localhost:5000/api/dashboard/school-data', {
+        // --- THIS IS THE CHANGE ---
+        // We are now sending the token in the 'x-auth-token' header
+        // to match your existing student authentication middleware.
+        const config = {
           headers: {
-            'Authorization': `Bearer ${token}` // This line is the fix
+            'x-auth-token': token // The header key is now 'x-auth-token'
           }
-        });
+        };
 
-        setDashboardData(response.data);
+        // 3. Make the API call with the correct header
+        const res = await axios.get('http://localhost:5000/api/dashboard/school-data', config);
+        setDashboardData(res.data);
+
       } catch (err) {
-        setError('Failed to fetch dashboard data. Your session may have expired.');
-        console.error(err);
+        console.error('Dashboard fetch error:', err);
+        const errorMessage = err.response ? err.response.data.msg : 'Failed to fetch dashboard data.';
+        setError(`${errorMessage} Please try logging in again.`);
       } finally {
         setLoading(false);
       }
     };
 
-    if (schoolName) {
-      fetchData();
-    }
-  }, [schoolName]);
+    fetchData();
+  }, []); // This hook runs once when the dashboard loads
+
 
 
   // Close dropdown when clicking outside

@@ -1,39 +1,55 @@
 import axios from 'axios';
 
+// 1. Create a centralized Axios instance
+const api = axios.create({
+  baseURL: 'http://localhost:5000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// 2. Add a request interceptor to automatically attach the token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['x-auth-token'] = token;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// 3. Add a response interceptor to handle 401 errors globally
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response && err.response.status === 401) {
+      console.error('Unauthorized! Logging out.');
+      localStorage.removeItem('token');
+      window.location.href = '/login'; 
+    }
+    return Promise.reject(err);
+  }
+);
+
 /**
  * Sends a request to the backend to award points to the logged-in user.
  * @param {number} points - The number of points to award.
- * @returns {Promise<object|undefined>} A promise that resolves with the server's response (e.g., { totalPoints: ... }) or undefined on error.
+ * @returns {Promise<object|undefined>} A promise that resolves with the server's response.
  */
 export async function awardPoints(points) {
-  // 1. Get the authentication token from local storage
-  const token = localStorage.getItem('token');
-  
-  // 2. If there's no token, we can't proceed.
-  if (!token) {
-    console.warn('User is not authenticated. Points cannot be awarded.');
-    return; // Exit the function
-  }
-
-  // 3. Use a try...catch block to handle potential network errors
   try {
-    // 4. Send a PATCH request to the backend endpoint
-    const response = await axios.patch(
-      'http://localhost:5000/api/profile/points',
-      { points }, // The data payload: { "points": ... }
-      {
-        headers: {
-          'x-auth-token': token // Include the auth token in the headers
-        }
-      }
-    );
+    const response = await api.patch('/profile/points', { points }); 
     
-    // 5. Log the success and return the updated data
-    console.log(`Successfully awarded ${points} points. New total:`, response.data.totalPoints);
+    // --- THE FIX IS HERE ---
+    // Change 'response.data.totalPoints' to 'response.data.newTotalPoints'
+    console.log(`Successfully awarded ${points} points. New total:`, response.data.newTotalPoints);
+    
     return response.data;
-
   } catch (error) {
-    // 6. If an error occurs, log it for debugging
     console.error('Failed to award points:', error.response?.data?.msg || error.message);
   }
 }
+
+export default api;

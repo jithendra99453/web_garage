@@ -35,10 +35,7 @@ const allGames = [
 ];
 
 const badges = [
-    { id: 1, name: "Recycling Hero", icon: "🏆", color: "badge-yellow" },
-    { id: 2, name: "Water Saver", icon: "💧", color: "badge-blue" },
-    { id: 3, name: "Energy Master", icon: "⚡", color: "badge-green" },
-    { id: 4, name: "Eco Warrior", icon: "🌱", color: "badge-emerald" }
+    
 ];
 
 const upcomingTasks = [
@@ -187,10 +184,6 @@ const StudentDashboard = () => {
                 <User size={20} />
                 <span>Profile</span>
               </Link>
-              <button className={styles['mobile-menu-item']}>
-                <Settings size={20} />
-                <span>Settings</span>
-              </button>
               <button 
                 className={styles['mobile-menu-item-danger']}
                 onClick={() => {
@@ -250,7 +243,9 @@ const StudentDashboard = () => {
               <Zap className={styles['stat-icon']} />
             </div>
             <div className={styles['stat-content']}>
-              <div className={styles['stat-number']}>{studentData.totalPoints.toLocaleString()}</div>
+              <div className={styles['stat-number']}>
+                  {(studentData.totalPoints ?? 0).toLocaleString()}
+              </div>
               <div className={styles['stat-label']}>Eco Points</div>
             </div>
           </div>
@@ -284,8 +279,7 @@ const StudentDashboard = () => {
           <div className={styles['badges-grid']}>
             {badges.map((badge) => (
               <div key={badge.id} className={`${styles['badge-item']} ${styles[badge.color]}`}>
-                <div className={styles['badge-icon']}>{badge.icon}</div>
-                <div className={styles['badge-name']}>{badge.name}</div>
+                <p styles ={{color:'black'}}>No Badges Earned</p>
               </div>
             ))}
           </div>
@@ -404,7 +398,7 @@ const StudentDashboard = () => {
                   </div>
                   <span className={styles['impact-label']}>CO₂ Saved</span>
                 </div>
-                <span className={styles['impact-value']}>{studentData.co2Saved} kg</span>
+                <span className={styles['impact-value']}>{studentData.co2Saved} 0kg</span>
                 <p className={styles['impact-description']}>Equivalent to planting 3 trees this month!</p>
               </div>
               
@@ -415,7 +409,7 @@ const StudentDashboard = () => {
                   </div>
                   <span className={styles['impact-label']}>Plastic Reduced</span>
                 </div>
-                <span className={styles['impact-value']}>{studentData.plasticReduced} kg</span>
+                <span className={styles['impact-value']}>{studentData.plasticReduced} 0kg</span>
                 <p className={styles['impact-description']}>160 plastic bottles diverted from landfills!</p>
               </div>
               
@@ -424,7 +418,7 @@ const StudentDashboard = () => {
                   <span className={styles['impact-label']}>Weekly Goal Progress</span>
                 </div>
                 <div className={styles['goal-progress']}>
-                  <div className={styles['goal-fill']} style={{ width: '73%' }}></div>
+                  <div className={styles['goal-fill']} style={{ width: '0%' }}></div>
                 </div>
                 <span className={styles['impact-value']}>0%</span>
                 <p className={styles['impact-description']}>Keep going! You're doing great this week.</p>

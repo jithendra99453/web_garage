@@ -19,16 +19,25 @@ router.get('/generate', async (req, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `
-      Generate a list of 10 multiple-choice quiz questions about environmental science and sustainability.
-      Provide the output ONLY in a valid JSON array format.
-      Each object in the array MUST have this exact structure, with these exact property names:
-      {
-        "question": "The question text.",
-        "options": ["Option A", "Option B", "Option C", "Option D"],
-        "correctAnswer": (a zero-based index of the correct answer, e.g., 0, 1, 2, or 3),
-        "explanation": "A brief and interesting explanation or tip for why the answer is correct."
-      }
-    `;
+        Generate a list of 10 UNIQUE multiple-choice quiz questions about environmental science and sustainability. 
+
+        Requirements:
+        1. Questions should vary in difficulty (easy, medium, hard).
+        2. Cover a broad range of topics such as: climate change, renewable energy, waste management, biodiversity, water conservation, sustainable agriculture, pollution, green technologies, and environmental policies.
+        3. Do NOT repeat the same question or wording in different runs.
+        4. Avoid overly generic questions; make them context-based or scenario-driven where possible.
+        5. Randomize the order of correct answers (not always the first option).
+
+        Provide the output ONLY in a valid JSON array format.
+        Each object MUST strictly follow this structure:
+        {
+          "question": "The question text.",
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "correctAnswer": (a zero-based index of the correct answer, e.g., 0, 1, 2, or 3),
+          "explanation": "A brief and interesting explanation or tip for why the answer is correct."
+        }
+      `;
+
 
     const result = await model.generateContent(prompt);
     const response = await result.response;

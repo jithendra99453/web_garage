@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import UserContext from '../context/UserContext';
 
 const ProtectedRoute = () => {
-  // Check if a JWT exists in local storage
-  const token = localStorage.getItem('token');
-  
-  // If a token exists, allow access to the nested route (the dashboard)
-  // Otherwise, redirect the user to the login page
-  return token ? <Outlet /> : <Navigate to="/login" />;
+  const { studentData, isLoading } = useContext(UserContext);
+
+  // KEY FIX: Wait for the loading to finish
+  if (isLoading) {
+    // While loading, render nothing or a spinner
+    return <div>Loading...</div>; 
+  }
+
+  // After loading, if there's user data, show the protected content
+  if (studentData) {
+    return <Outlet />;
+  }
+
+  // If loading is done and there is no user data, redirect to login
+  return <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;

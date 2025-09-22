@@ -1,41 +1,14 @@
-// backend/models/Task.js
-
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const taskSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  dueDate: {
-    type: Date,
-    required: true,
-  },
-  points: {
-    type: Number,
-    required: true,
-    min: 1,
-  },
-  classId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Class', // Assuming you have a 'Class' model
-    required: true,
-  },
-  assignedTo: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student', // Assuming you have a 'Student' model
-  }],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+const TaskSchema = new Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  dueDate: { type: Date, required: true },
+  points: { type: Number, required: true },
+  classId: { type: Schema.Types.ObjectId, ref: 'Class', required: true },
+  teacher: { type: Schema.Types.ObjectId, ref: 'Teacher', required: true },
+  assignedTo: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
+}, { timestamps: true });
 
-const Task = mongoose.model('Task', taskSchema);
-
-module.exports = Task;
+module.exports = mongoose.model('Task', TaskSchema);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
 
 import { UserProvider } from './context/UserContext.jsx'; 
 // Import your components
@@ -44,7 +44,8 @@ import TeacherSignUp from './components/TeacherSignUp/TeacherSignUp.jsx';
 
 function App() {
   return (
-    
+  <Router>
+    <UserProvider>
     <Routes>
       {/* --- Public Routes ---*/}
       <Route path="/" element={<LandingPage />} />
@@ -54,11 +55,7 @@ function App() {
       <Route path="/signup/school" element={<SchoolModule />} />
 
       {/* --- Protected Routes --- */}
-      <Route element={
-        <UserProvider>
-          <ProtectedRoute />
-        </UserProvider>
-      }>
+      <Route element={<ProtectedRoute />}>
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -94,6 +91,8 @@ function App() {
         {/* <Route path="/school-dashboard" element={<SchoolDashboard />} /> */}
       </Route>
     </Routes>
+    </UserProvider>
+  </Router>
   );
 }
 
