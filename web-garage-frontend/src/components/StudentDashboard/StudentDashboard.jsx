@@ -244,7 +244,8 @@ const StudentDashboard = () => {
             </div>
             <div className={styles['stat-content']}>
               <div className={styles['stat-number']}>
-                  {(studentData.totalPoints ?? 0).toLocaleString()}
+              
+                  {(studentData.ecoPoints ?? 0).toLocaleString()}
               </div>
               <div className={styles['stat-label']}>Eco Points</div>
             </div>

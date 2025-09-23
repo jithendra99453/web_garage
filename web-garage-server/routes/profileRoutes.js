@@ -7,6 +7,12 @@ const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
 const School = require('../models/School');
 
+
+
+
+
+
+
 // ===============================================
 //         GET USER PROFILE
 // ===============================================
@@ -114,6 +120,10 @@ router.put('/', auth, async (req, res) => {
 
 // @route   PATCH /api/profile/points
 // @desc    Add points to a student's total
+// In web-garage-server/routes/profileRoutes.js
+
+// @route   PATCH /api/profile/points
+// @desc    Add points to a student's total
 router.patch('/points', auth, async (req, res) => {
   const { points } = req.body;
   const { role, id } = req.user;
@@ -128,10 +138,10 @@ router.patch('/points', auth, async (req, res) => {
 
   try {
     // --- THE FIX IS HERE ---
-    // Use $inc on the correct field name: 'totalPoints'
+    // Use the correct field name from your model: 'ecoPoints'
     const student = await Student.findByIdAndUpdate(
       id,
-      { $inc: { totalPoints: points } },
+      { $inc: { ecoPoints: points } }, // Change totalPoints to ecoPoints
       { new: true }
     );
 
@@ -142,8 +152,8 @@ router.patch('/points', auth, async (req, res) => {
     // --- AND THE FIX IS HERE ---
     // Send back the correct field in the response
     res.json({ 
-        message: `Successfully awarded ${points} points.`,
-        newTotalPoints: student.totalPoints 
+      message: `Successfully awarded ${points} points.`,
+      newTotalPoints: student.ecoPoints // Change totalPoints to ecoPoints
     });
 
   } catch (err) {
@@ -151,6 +161,7 @@ router.patch('/points', auth, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 
 // (Your GET and PUT routes remain the same)
 
